@@ -1,0 +1,6 @@
+{
+  "name": "Vanguard Tactical",
+  "description": "Tactical shooter custom match (내전) analytics dashboard, agent statistics, leaderboard, AI match result screenshot scanner, and custom server management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
