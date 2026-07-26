@@ -209,7 +209,13 @@ app.post("/api/analyze-match", async (req, res) => {
             },
             {
               type: "text",
-              text: `Analyze this Valorant/Tactical shooter match summary screenshot (${fileName || "match_result"}). Extract the scoreboard: map name, result, score, match type, MVP, and every player's nickname, agent, role, kills, deaths, assists, combat score, and win/loss.`,
+              text: `Analyze this Valorant/Tactical shooter match summary screenshot (${fileName || "match_result"}). Extract the scoreboard: map name, result, score, match type, MVP, and every player's nickname, agent, role, kills, deaths, assists, combat score.
+
+To determine each player's isWin, do NOT guess from the top VICTORY/DEFEAT text alone. Follow this exact rule based on row highlight colors:
+1. The VICTORY/DEFEAT text at the top-middle is the result for the player whose row is highlighted gold/yellow.
+2. That gold/yellow player belongs to the team whose rows are highlighted cyan/teal (green) — every player on the cyan/teal team shares that same result.
+3. The other 5 players, whose rows are highlighted red, get the OPPOSITE result from the cyan/teal team.
+Set isWin for all 10 players using this rule.`,
             },
           ],
         },

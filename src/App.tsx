@@ -135,6 +135,30 @@ const applyMatchToAgentRoster = (agents: AgentStat[], matchPlayers: MatchPlayer[
   return updated.map((a) => ({ ...a, pickRate: Number(((a.picksCount / totalPicks) * 100).toFixed(1)) }));
 };
 
+// Rebuilds players + agent roster from scratch by replaying every remaining match,
+// oldest first (matches are stored newest-first, and replay order matters for
+// recentAgents). Used after deleting a match so stats can't drift out of sync —
+// undoing a single match's contribution in place would need exact inverses for
+// every weighted average and top-agents list, which is far more error-prone.
+const recomputeFromMatches = (matches: MatchRecord[], zeroedAgents: AgentStat[]): { players: PlayerProfile[]; agents: AgentStat[] } => {
+  let players: PlayerProfile[] = [];
+  let agents = zeroedAgents;
+
+  [...matches].reverse().forEach((match) => {
+    match.players?.forEach((p) => {
+      const idx = players.findIndex((x) => x.nickname === p.nickname);
+      if (idx >= 0) {
+        players[idx] = applyMatchToPlayer(players[idx], p);
+      } else {
+        players.push(createPlayerFromMatch(p));
+      }
+    });
+    agents = applyMatchToAgentRoster(agents, match.players || []);
+  });
+
+  return { players: sortAndRankPlayers(players), agents };
+};
+
 // Helper to sort and recalculate sequential ranks (1, 2, 3, ...) for players
 export const sortAndRankPlayers = (playerList: PlayerProfile[]): PlayerProfile[] => {
   const sorted = [...playerList].sort((a, b) => {
@@ -303,10 +327,20 @@ export function App() {
 
   // Delete Match Record
   const handleDeleteMatch = (matchId: string) => {
-    updateCurrentServerData((data) => ({
-      ...data,
-      matches: data.matches.filter((m) => m.id !== matchId),
-    }));
+    updateCurrentServerData((data) => {
+      const remainingMatches = data.matches.filter((m) => m.id !== matchId);
+      const zeroedAgents = data.agents.map((a) => ({
+        ...a,
+        picksCount: 0,
+        winsCount: 0,
+        pickRate: 0,
+        winRate: 0,
+        avgKda: 0,
+        avgCombatScore: 0,
+      }));
+      const { players, agents } = recomputeFromMatches(remainingMatches, zeroedAgents);
+      return { matches: remainingMatches, players, agents };
+    });
   };
 
   // Create New Server — persisted on the backend, gets its own isolated (empty) dataset.
