@@ -93,6 +93,14 @@ app.put("/api/servers/:id/data", (req, res) => {
   res.json({ success: true });
 });
 
+// API: delete a custom server (admin cleanup — the app has no UI for this yet)
+app.delete("/api/servers/:id", (req, res) => {
+  store.servers = store.servers.filter((s) => s.id !== req.params.id);
+  delete store.serverData[req.params.id];
+  saveStore(store);
+  res.json({ success: true });
+});
+
 // Initialize Claude client (lazy/guarded on server)
 const getClaudeClient = () => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
