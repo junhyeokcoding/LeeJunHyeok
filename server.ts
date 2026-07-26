@@ -93,8 +93,15 @@ app.put("/api/servers/:id/data", (req, res) => {
   res.json({ success: true });
 });
 
-// API: delete a custom server (admin cleanup — the app has no UI for this yet)
+// API: delete a custom server — requires that server's admin password
 app.delete("/api/servers/:id", (req, res) => {
+  const server = store.servers.find((s) => s.id === req.params.id);
+  if (!server) {
+    return res.status(404).json({ success: false, error: "존재하지 않는 서버입니다." });
+  }
+  if (req.body?.password !== server.adminPassword) {
+    return res.status(401).json({ success: false, error: "관리자 비밀번호가 일치하지 않습니다." });
+  }
   store.servers = store.servers.filter((s) => s.id !== req.params.id);
   delete store.serverData[req.params.id];
   saveStore(store);

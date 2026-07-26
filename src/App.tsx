@@ -212,6 +212,20 @@ export function App() {
     setCurrentTab('login');
   };
 
+  // Delete the currently active server (admin-password gated on the backend)
+  const handleDeleteServer = async (adminPassword: string): Promise<{ success: boolean; error?: string }> => {
+    const res = await fetch(`/api/servers/${currentServerId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: adminPassword }),
+    });
+    const data = await res.json();
+    if (data.success) {
+      handleLogout();
+    }
+    return data;
+  };
+
   // Add Match from AI Screenshot Scanner
   const handleAddMatch = (newMatch: MatchRecord) => {
     updateCurrentServerData((data) => {
@@ -394,9 +408,11 @@ export function App() {
           <AdminPanelModal
             players={players}
             matches={matches}
+            serverName={serverName}
             onUpdateNickname={handleUpdateNickname}
             onMergePlayers={handleMergePlayers}
             onDeleteMatch={handleDeleteMatch}
+            onDeleteServer={handleDeleteServer}
           />
         )}
       </main>

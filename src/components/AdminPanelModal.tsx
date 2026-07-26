@@ -6,9 +6,11 @@ import { ShieldAlert, Users, Trash2, Edit2, GitMerge, Check, AlertTriangle, Serv
 interface AdminPanelModalProps {
   players: PlayerProfile[];
   matches: MatchRecord[];
+  serverName: string;
   onUpdateNickname: (playerId: string, newName: string) => void;
   onMergePlayers: (sourceId: string, targetId: string) => void;
   onDeleteMatch: (matchId: string) => void;
+  onDeleteServer: (adminPassword: string) => Promise<{ success: boolean; error?: string }>;
 }
 
 const EASE = [0.32, 0.72, 0, 1] as const;
@@ -22,9 +24,11 @@ const reveal = (delay = 0) => ({
 export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   players,
   matches,
+  serverName,
   onUpdateNickname,
   onMergePlayers,
   onDeleteMatch,
+  onDeleteServer,
 }) => {
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>('');
@@ -33,6 +37,24 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
   const [targetMergeId, setTargetMergeId] = useState<string>('');
   const [mergeSuccessMsg, setMergeSuccessMsg] = useState<string>('');
   const [mergeErrorMsg, setMergeErrorMsg] = useState<string>('');
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteErrorMsg, setDeleteErrorMsg] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteServer = async () => {
+    if (!deletePassword) {
+      setDeleteErrorMsg('관리자 비밀번호를 입력해주세요.');
+      return;
+    }
+    setIsDeleting(true);
+    const result = await onDeleteServer(deletePassword);
+    setIsDeleting(false);
+    if (!result.success) {
+      setDeleteErrorMsg(result.error || '서버 삭제에 실패했습니다.');
+    }
+  };
 
   const handleStartEdit = (player: PlayerProfile) => {
     setEditingPlayerId(player.id);
@@ -248,6 +270,60 @@ export const AdminPanelModal: React.FC<AdminPanelModalProps> = ({
           </div>
         </motion.div>
       </div>
+
+      <motion.div {...reveal(0.15)} className="glass-shell shadow-xl shadow-black/30 ring-1 ring-rose-500/20">
+        <div className="glass-core backdrop-blur-xl p-6 space-y-4">
+          <h2 className="text-base font-semibold text-white flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-rose-400" />
+            위험 구역
+          </h2>
+          <p className="text-xs text-zinc-500">
+            "{serverName}" 서버와 모든 플레이어/경기 데이터를 완전히 삭제합니다. 되돌릴 수 없습니다.
+          </p>
+
+          {!isDeleteOpen ? (
+            <button
+              onClick={() => setIsDeleteOpen(true)}
+              className="px-4 py-2.5 rounded-full bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 ring-1 ring-rose-500/30 font-bold text-xs flex items-center gap-1.5 transition-colors duration-500 ease-premium"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>이 서버 삭제</span>
+            </button>
+          ) : (
+            <div className="space-y-3">
+              {deleteErrorMsg && (
+                <div className="p-3 rounded-xl bg-rose-950/40 ring-1 ring-rose-700/30 text-rose-400 text-xs font-medium flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  {deleteErrorMsg}
+                </div>
+              )}
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="관리자 비밀번호 확인"
+                className="w-full bg-white/[0.03] ring-1 ring-white/10 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:ring-rose-500/50"
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDeleteServer}
+                  disabled={isDeleting}
+                  className="px-4 py-2.5 rounded-full bg-rose-600 hover:bg-rose-500 disabled:opacity-40 text-white font-bold text-xs flex items-center gap-1.5 transition-colors duration-500 ease-premium"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>{isDeleting ? '삭제 중...' : '삭제 확정'}</span>
+                </button>
+                <button
+                  onClick={() => { setIsDeleteOpen(false); setDeletePassword(''); setDeleteErrorMsg(''); }}
+                  className="px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-zinc-300 font-bold text-xs transition-colors duration-500 ease-premium"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </motion.div>
     </div>
   );
 };
