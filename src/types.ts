@@ -83,6 +83,15 @@ export interface CustomServer {
   adminPassword: string;
 }
 
+// What the backend hands back to clients — passwords never leave the server.
+export type PublicServer = Omit<CustomServer, 'publicPassword' | 'adminPassword'>;
+
+export interface ServerData {
+  players: PlayerProfile[];
+  matches: MatchRecord[];
+  agents: AgentStat[];
+}
+
 export type ViewTab =
   | 'login'
   | 'dashboard'

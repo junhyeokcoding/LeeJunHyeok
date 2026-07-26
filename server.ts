@@ -1,8 +1,11 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import Anthropic from "@anthropic-ai/sdk";
+import { MOCK_CUSTOM_SERVERS, INITIAL_AGENTS, INITIAL_MATCHES, INITIAL_PLAYERS } from "./src/data/mockData";
+import type { CustomServer, ServerData } from "./src/types";
 
 dotenv.config({ quiet: true });
 
@@ -11,6 +14,84 @@ const PORT = Number(process.env.PORT) || 3000;
 
 // Body parser middleware
 app.use(express.json({ limit: "25mb" }));
+
+// --- Server-side data store (JSON file) ---------------------------------
+// ponytail: whole-file read/write, no locking — fine for a handful of small
+// custom-game servers. If this ever needs real concurrent writers, move to
+// a real DB (e.g. Postgres) instead of hand-rolling locks around a JSON file.
+const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), "data");
+const STORE_PATH = path.join(DATA_DIR, "store.json");
+
+interface Store {
+  servers: CustomServer[];
+  serverData: Record<string, ServerData>;
+}
+
+const zeroedAgents = () =>
+  INITIAL_AGENTS.map((a) => ({ ...a, picksCount: 0, winsCount: 0, pickRate: 0, winRate: 0, avgKda: 0, avgCombatScore: 0 }));
+
+function loadStore(): Store {
+  try {
+    return JSON.parse(fs.readFileSync(STORE_PATH, "utf-8"));
+  } catch {
+    const seeded: Store = {
+      servers: MOCK_CUSTOM_SERVERS,
+      serverData: Object.fromEntries(
+        MOCK_CUSTOM_SERVERS.map((s) => [
+          s.id,
+          s.id === "srv-1"
+            ? { players: INITIAL_PLAYERS, matches: INITIAL_MATCHES, agents: INITIAL_AGENTS }
+            : { players: [], matches: [], agents: zeroedAgents() },
+        ])
+      ),
+    };
+    saveStore(seeded);
+    return seeded;
+  }
+}
+
+function saveStore(s: Store) {
+  fs.mkdirSync(DATA_DIR, { recursive: true });
+  fs.writeFileSync(STORE_PATH, JSON.stringify(s));
+}
+
+const store = loadStore();
+
+const stripPasswords = ({ publicPassword, adminPassword, ...rest }: CustomServer) => rest;
+
+// API: create a custom server (persisted on the backend, not per-browser)
+app.post("/api/servers", (req, res) => {
+  const newServer: CustomServer = req.body;
+  store.servers = [newServer, ...store.servers];
+  store.serverData[newServer.id] = { players: [], matches: [], agents: zeroedAgents() };
+  saveStore(store);
+  res.json(stripPasswords(newServer));
+});
+
+// API: log in to a server by name + password (public or admin)
+app.post("/api/servers/login", (req, res) => {
+  const { name, password } = req.body;
+  const server = store.servers.find((s) => s.name.trim() === String(name || "").trim());
+  if (!server) {
+    return res.status(404).json({ success: false, error: "존재하지 않는 서버입니다. 서버명을 확인하거나 새 서버를 생성해주세요." });
+  }
+  const isAdmin = password === server.adminPassword;
+  if (!isAdmin && password !== server.publicPassword) {
+    return res.status(401).json({ success: false, error: "비밀번호가 일치하지 않습니다." });
+  }
+  res.json({ success: true, isAdmin, server: stripPasswords(server) });
+});
+
+// API: read/write a server's roster + match data
+app.get("/api/servers/:id/data", (req, res) => {
+  res.json(store.serverData[req.params.id] || { players: [], matches: [], agents: [] });
+});
+
+app.put("/api/servers/:id/data", (req, res) => {
+  store.serverData[req.params.id] = req.body;
+  saveStore(store);
+  res.json({ success: true });
+});
 
 // Initialize Claude client (lazy/guarded on server)
 const getClaudeClient = () => {

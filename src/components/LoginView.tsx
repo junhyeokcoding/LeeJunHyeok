@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Shield, Server, Plus, ArrowRight, Lock, Activity, Sparkles, AlertCircle } from 'lucide-react';
-import { CustomServer } from '../types';
+import { PublicServer } from '../types';
 import { PillButton } from './ui/PillButton';
 
 interface LoginViewProps {
-  servers: CustomServer[];
-  onLoginSuccess: (serverName: string, operatorId: string, isAdmin: boolean) => void;
+  onLoginSuccess: (server: PublicServer, operatorId: string, isAdmin: boolean) => void;
   onOpenCreateServer: () => void;
 }
 
 const EASE = [0.32, 0.72, 0, 1] as const;
 
 export const LoginView: React.FC<LoginViewProps> = ({
-  servers,
   onLoginSuccess,
   onOpenCreateServer,
 }) => {
@@ -21,8 +19,9 @@ export const LoginView: React.FC<LoginViewProps> = ({
   const [operatorId, setOperatorId] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const targetName = serverInput.trim();
     if (!targetName) {
@@ -34,22 +33,25 @@ export const LoginView: React.FC<LoginViewProps> = ({
       return;
     }
 
-    const server = servers.find((s) => s.name.trim() === targetName);
-    if (!server) {
-      setErrorMsg('존재하지 않는 서버입니다. 서버명을 확인하거나 새 서버를 생성해주세요.');
-      return;
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/servers/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: targetName, password }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setErrorMsg(data.error || '로그인에 실패했습니다.');
+        return;
+      }
+      setErrorMsg('');
+      onLoginSuccess(data.server, operatorId.trim(), data.isAdmin);
+    } catch {
+      setErrorMsg('서버에 연결할 수 없습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    let isAdmin = false;
-    if (password === server.adminPassword) {
-      isAdmin = true;
-    } else if (password !== server.publicPassword) {
-      setErrorMsg('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    setErrorMsg('');
-    onLoginSuccess(server.name, operatorId.trim(), isAdmin);
   };
 
   return (
@@ -146,8 +148,8 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 />
               </div>
 
-              <PillButton type="submit" icon={ArrowRight} className="w-full justify-center mt-2">
-                내전 서버 입장하기
+              <PillButton type="submit" icon={ArrowRight} disabled={isSubmitting} className="w-full justify-center mt-2">
+                {isSubmitting ? '접속 중...' : '내전 서버 입장하기'}
               </PillButton>
             </form>
 

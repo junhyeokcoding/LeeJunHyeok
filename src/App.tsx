@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ViewTab, PlayerProfile, MatchRecord, MatchPlayer, AgentStat, CustomServer, RoleType, PlayerRoleStat } from './types';
-import { INITIAL_AGENTS, INITIAL_MATCHES, INITIAL_PLAYERS, MOCK_CUSTOM_SERVERS } from './data/mockData';
+import { ViewTab, PlayerProfile, MatchRecord, MatchPlayer, AgentStat, CustomServer, PublicServer, RoleType, PlayerRoleStat, ServerData } from './types';
 import { HeaderNavigation } from './components/HeaderNavigation';
 import { LoginView } from './components/LoginView';
 import { DashboardView } from './components/DashboardView';
@@ -13,37 +12,12 @@ import { MatchDetailModal } from './components/MatchDetailModal';
 import { CreateServerModal } from './components/CreateServerModal';
 import { AmbientBackground } from './components/AmbientBackground';
 
-const DEMO_SERVER_ID = 'srv-1';
-// v2: CustomServer now carries publicPassword/adminPassword.
-// v3: agent roster portrait URLs/names corrected (Veto, Miks) in mockData.
-// Bump the key on any change to the seeded shape so stale cached copies don't shadow it.
-const STORAGE_KEY_SERVERS = 'vanguard-tactical:servers:v3';
-const STORAGE_KEY_SERVER_DATA = 'vanguard-tactical:server-data:v3';
-
-interface ServerData {
-  players: PlayerProfile[];
-  matches: MatchRecord[];
-  agents: AgentStat[];
-}
-
 const EMPTY_ROLE_STATS: Record<RoleType, PlayerRoleStat> = {
   타격대: { role: '타격대', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
   감시자: { role: '감시자', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
   전략가: { role: '전략가', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
   척후대: { role: '척후대', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
 };
-
-// Same character roster, but every stat zeroed out for a brand new server.
-const emptyAgentRoster = (): AgentStat[] =>
-  INITIAL_AGENTS.map((a) => ({
-    ...a,
-    picksCount: 0,
-    winsCount: 0,
-    pickRate: 0,
-    winRate: 0,
-    avgKda: 0,
-    avgCombatScore: 0,
-  }));
 
 // A player uploaded in a match that has no existing profile yet gets a fresh one.
 const createPlayerFromMatch = (p: MatchPlayer): PlayerProfile => {
@@ -161,58 +135,6 @@ const applyMatchToAgentRoster = (agents: AgentStat[], matchPlayers: MatchPlayer[
   return updated.map((a) => ({ ...a, pickRate: Number(((a.picksCount / totalPicks) * 100).toFixed(1)) }));
 };
 
-function loadServers(): CustomServer[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_SERVERS);
-    if (raw) return JSON.parse(raw);
-  } catch {
-    // fall through to defaults
-  }
-  return MOCK_CUSTOM_SERVERS;
-}
-
-// Re-applies mockData's canonical static agent fields (name/portrait/role) onto cached
-// per-server stats, so a mockData.ts fix (portrait URL, renamed agent) shows up immediately
-// without waiting on a storage-key version bump. Only picks/wins/rates carry over from cache.
-const reconcileAgents = (cachedAgents: AgentStat[] | undefined): AgentStat[] => {
-  const cachedById = new Map((cachedAgents || []).map((a) => [a.id, a]));
-  return INITIAL_AGENTS.map((canonical) => {
-    const cached = cachedById.get(canonical.id);
-    return {
-      ...canonical,
-      picksCount: cached?.picksCount ?? 0,
-      winsCount: cached?.winsCount ?? 0,
-      pickRate: cached?.pickRate ?? 0,
-      winRate: cached?.winRate ?? 0,
-      avgKda: cached?.avgKda ?? 0,
-      avgCombatScore: cached?.avgCombatScore ?? 0,
-    };
-  });
-};
-
-function loadServerDataMap(servers: CustomServer[]): Record<string, ServerData> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY_SERVER_DATA);
-    if (raw) {
-      const parsed: Record<string, ServerData> = JSON.parse(raw);
-      Object.keys(parsed).forEach((id) => {
-        parsed[id] = { ...parsed[id], agents: reconcileAgents(parsed[id].agents) };
-      });
-      return parsed;
-    }
-  } catch {
-    // fall through to defaults
-  }
-  const map: Record<string, ServerData> = {};
-  servers.forEach((s) => {
-    map[s.id] =
-      s.id === DEMO_SERVER_ID
-        ? { players: INITIAL_PLAYERS, matches: INITIAL_MATCHES, agents: INITIAL_AGENTS }
-        : { players: [], matches: [], agents: emptyAgentRoster() };
-  });
-  return map;
-}
-
 // Helper to sort and recalculate sequential ranks (1, 2, 3, ...) for players
 export const sortAndRankPlayers = (playerList: PlayerProfile[]): PlayerProfile[] => {
   const sorted = [...playerList].sort((a, b) => {
@@ -236,24 +158,22 @@ export function App() {
   const [serverName, setServerName] = useState<string>('');
   const [operatorId, setOperatorId] = useState<string>('');
 
-  const [servers, setServers] = useState<CustomServer[]>(() => loadServers());
-  const [serverDataMap, setServerDataMap] = useState<Record<string, ServerData>>(() =>
-    loadServerDataMap(loadServers())
-  );
   const [currentServerId, setCurrentServerId] = useState<string>('');
+  const [serverData, setServerData] = useState<ServerData>({ players: [], matches: [], agents: [] });
 
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerProfile | null>(null);
   const [selectedMatch, setSelectedMatch] = useState<MatchRecord | null>(null);
   const [isCreateServerOpen, setIsCreateServerOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  // Server data now lives on the backend (data/store.json), not per-browser —
+  // fetch it whenever we switch into a server.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_SERVERS, JSON.stringify(servers));
-  }, [servers]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY_SERVER_DATA, JSON.stringify(serverDataMap));
-  }, [serverDataMap]);
+    if (!currentServerId) return;
+    fetch(`/api/servers/${currentServerId}/data`)
+      .then((r) => r.json())
+      .then(setServerData);
+  }, [currentServerId]);
 
   useEffect(() => {
     if (currentTab === 'admin' && !isAdmin) {
@@ -261,21 +181,25 @@ export function App() {
     }
   }, [currentTab, isAdmin]);
 
-  const { players = [], matches = [], agents = [] } = serverDataMap[currentServerId] || {};
+  const { players, matches, agents } = serverData;
 
   const updateCurrentServerData = (updater: (data: ServerData) => ServerData) => {
-    setServerDataMap((prev) => ({
-      ...prev,
-      [currentServerId]: updater(prev[currentServerId] || { players: [], matches: [], agents: [] }),
-    }));
+    setServerData((prev) => {
+      const next = updater(prev);
+      fetch(`/api/servers/${currentServerId}/data`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(next),
+      });
+      return next;
+    });
   };
 
   // Handle Login
-  const handleLoginSuccess = (selectedSrv: string, opId: string, admin: boolean) => {
-    const target = servers.find((s) => s.name === selectedSrv);
-    setServerName(selectedSrv);
+  const handleLoginSuccess = (server: PublicServer, opId: string, admin: boolean) => {
+    setServerName(server.name);
     setOperatorId(opId);
-    setCurrentServerId(target?.id || '');
+    setCurrentServerId(server.id);
     setIsAdmin(admin);
     setIsLoggedIn(true);
     setCurrentTab('dashboard');
@@ -371,16 +295,17 @@ export function App() {
     }));
   };
 
-  // Create New Server — gets its own isolated (empty) dataset, never shares with other servers.
-  const handleCreateServer = (newServer: CustomServer) => {
-    setServers((prev) => [newServer, ...prev]);
-    setServerDataMap((prev) => ({
-      ...prev,
-      [newServer.id]: { players: [], matches: [], agents: emptyAgentRoster() },
-    }));
-    setServerName(newServer.name);
-    setOperatorId(newServer.operatorId);
-    setCurrentServerId(newServer.id);
+  // Create New Server — persisted on the backend, gets its own isolated (empty) dataset.
+  const handleCreateServer = async (newServer: CustomServer) => {
+    const res = await fetch('/api/servers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newServer),
+    });
+    const created: PublicServer = await res.json();
+    setServerName(created.name);
+    setOperatorId(created.operatorId);
+    setCurrentServerId(created.id);
     setIsAdmin(true); // the creator set the admin password, so they start as admin
     setIsLoggedIn(true);
     setCurrentTab('dashboard');
@@ -391,7 +316,6 @@ export function App() {
       <>
         <AmbientBackground />
         <LoginView
-          servers={servers}
           onLoginSuccess={handleLoginSuccess}
           onOpenCreateServer={() => setIsCreateServerOpen(true)}
         />
