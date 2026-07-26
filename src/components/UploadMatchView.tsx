@@ -60,8 +60,14 @@ export const UploadMatchView: React.FC<UploadMatchViewProps> = ({
     return () => window.removeEventListener('paste', handlePaste);
   }, []);
 
-  const handleLoadSample = () => {
-    setSelectedImage('https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80');
+  // Loads the bundled example scoreboard screenshot and converts it to a data URI,
+  // same shape as a real drag-and-drop/paste, so "AI 스캔" can actually analyze it.
+  const handleLoadSample = async () => {
+    const res = await fetch('/example-scoreboard.png');
+    const blob = await res.blob();
+    const reader = new FileReader();
+    reader.onload = (event) => setSelectedImage(event.target?.result as string);
+    reader.readAsDataURL(blob);
   };
 
   const handleStartAnalysis = async () => {
