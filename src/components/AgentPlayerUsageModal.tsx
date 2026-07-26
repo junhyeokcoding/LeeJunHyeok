@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AgentStat, MatchRecord, PlayerProfile, PlayerRoleStat } from '../types';
 import { RoleIcon } from './RoleIcon';
-import { X, Users, Trophy, Flame, Zap, ArrowUpDown, ChevronRight, Search } from 'lucide-react';
+import { X, ArrowUpDown, ChevronRight, Search } from 'lucide-react';
 
 export interface AgentPlayerUsage {
   nickname: string;
@@ -147,164 +147,156 @@ export const AgentPlayerUsageModal: React.FC<AgentPlayerUsageModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-4xl w-full p-6 sm:p-8 shadow-2xl relative my-8 font-sans">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+      <div className="glass-shell max-w-4xl w-full my-8 shadow-2xl shadow-black/50">
+        <div className="glass-core backdrop-blur-2xl p-6 sm:p-8 relative font-sans">
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors duration-500 ease-premium flex items-center justify-center"
+          >
+            <X className="w-4 h-4" />
+          </button>
 
-        {/* Modal Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-6 mb-6">
-          <div className="flex items-center gap-4">
-            <img
-              src={agent.portraitUrl}
-              alt={agent.name}
-              referrerPolicy="no-referrer"
-              className="w-16 h-16 rounded-2xl object-cover bg-zinc-800 border-2 border-red-500/50 shadow-xl"
-            />
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <RoleIcon role={agent.role} size="sm" showLabel />
-                <span className="text-xs text-zinc-500 font-mono">AGENT ANALYTICS</span>
+          {/* Modal Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-6 mb-6">
+            <div className="flex items-center gap-4">
+              <img
+                src={agent.portraitUrl}
+                alt={agent.name}
+                referrerPolicy="no-referrer"
+                className="w-16 h-16 rounded-2xl object-cover bg-zinc-800 ring-2 ring-rose-500/40"
+              />
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <RoleIcon role={agent.role} size="sm" showLabel />
+                  <span className="text-xs text-zinc-500 font-mono">AGENT ANALYTICS</span>
+                </div>
+                <h2 className="text-2xl font-semibold text-white font-display flex items-center gap-2">
+                  <span>{agent.name}</span>
+                  <span className="text-xs font-normal text-zinc-500 font-sans">({agent.englishName})</span>
+                  <span className="text-rose-400 text-lg">사용 인원 목록</span>
+                </h2>
               </div>
-              <h2 className="text-2xl font-black text-white font-mono flex items-center gap-2">
-                <span>{agent.name}</span>
-                <span className="text-xs font-normal text-zinc-400 font-sans">({agent.englishName})</span>
-                <span className="text-red-500 text-lg">사용 인원 목록</span>
-              </h2>
+            </div>
+
+            <div className="flex items-center gap-3 font-mono text-xs">
+              <div className="bg-white/[0.03] ring-1 ring-white/10 px-3 py-2 rounded-2xl text-center">
+                <span className="text-zinc-500 block text-[10px]">총 선택 횟수</span>
+                <span className="font-bold text-cyan-400 text-sm">{agent.picksCount}회</span>
+              </div>
+              <div className="bg-white/[0.03] ring-1 ring-white/10 px-3 py-2 rounded-2xl text-center">
+                <span className="text-zinc-500 block text-[10px]">평균 승률</span>
+                <span className="font-bold text-emerald-400 text-sm">{agent.winRate}%</span>
+              </div>
+              <div className="bg-white/[0.03] ring-1 ring-white/10 px-3 py-2 rounded-2xl text-center">
+                <span className="text-zinc-500 block text-[10px]">플레이어 수</span>
+                <span className="font-bold text-white text-sm">{playerUsages.length}명</span>
+              </div>
             </div>
           </div>
 
-          {/* Quick Stat Pill Overview */}
-          <div className="flex items-center gap-3 font-mono text-xs">
-            <div className="bg-zinc-950 px-3 py-2 rounded-xl border border-zinc-800 text-center">
-              <span className="text-zinc-500 block text-[10px]">총 선택 횟수</span>
-              <span className="font-extrabold text-cyan-400 text-sm">{agent.picksCount}회</span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div className="relative max-w-xs w-full">
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="플레이어 닉네임 검색..."
+                className="w-full bg-white/[0.03] ring-1 ring-white/10 rounded-full pl-10 pr-4 py-2.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:ring-rose-500/50 transition-all"
+              />
             </div>
-            <div className="bg-zinc-950 px-3 py-2 rounded-xl border border-zinc-800 text-center">
-              <span className="text-zinc-500 block text-[10px]">평균 승률</span>
-              <span className="font-extrabold text-emerald-400 text-sm">{agent.winRate}%</span>
-            </div>
-            <div className="bg-zinc-950 px-3 py-2 rounded-xl border border-zinc-800 text-center">
-              <span className="text-zinc-500 block text-[10px]">플레이어 수</span>
-              <span className="font-extrabold text-white text-sm">{playerUsages.length}명</span>
+
+            <div className="text-xs text-zinc-500 font-mono">
+              클릭하여 해당 플레이어 상세 프로필 조회 가능
             </div>
           </div>
-        </div>
 
-        {/* Search & Sort Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div className="relative max-w-xs w-full">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="플레이어 닉네임 검색..."
-              className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-red-500"
-            />
-          </div>
-
-          <div className="text-xs text-zinc-400 font-mono">
-            클릭하여 해당 플레이어 상세 프로필 조회 가능
-          </div>
-        </div>
-
-        {/* Players List Table */}
-        <div className="overflow-x-auto rounded-xl border border-zinc-800/80">
-          <table className="w-full text-left text-xs text-zinc-300">
-            <thead className="bg-zinc-950 text-zinc-400 uppercase font-mono text-[11px] border-b border-zinc-800">
-              <tr>
-                <th className="py-3.5 px-4 font-bold">#</th>
-                <th className="py-3.5 px-4 font-bold">플레이어 (이름)</th>
-                <th
-                  onClick={() => handleSortToggle('matchesCount')}
-                  className="py-3.5 px-4 font-bold cursor-pointer hover:text-white"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>판수 (경기 수)</span>
-                    <ArrowUpDown className="w-3 h-3" />
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSortToggle('winRate')}
-                  className="py-3.5 px-4 font-bold cursor-pointer hover:text-white"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>승률 (%)</span>
-                    <ArrowUpDown className="w-3 h-3" />
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSortToggle('avgCombatScore')}
-                  className="py-3.5 px-4 font-bold cursor-pointer hover:text-white"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>평균 전투 점수 (ACS)</span>
-                    <ArrowUpDown className="w-3 h-3" />
-                  </div>
-                </th>
-                <th
-                  onClick={() => handleSortToggle('avgKda')}
-                  className="py-3.5 px-4 font-bold cursor-pointer hover:text-white"
-                >
-                  <div className="flex items-center gap-1">
-                    <span>KDA</span>
-                    <ArrowUpDown className="w-3 h-3" />
-                  </div>
-                </th>
-                <th className="py-3.5 px-4 text-right font-bold">상세</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/60 font-sans">
-              {filteredList.length > 0 ? (
-                filteredList.map((p, idx) => (
-                  <tr
-                    key={p.nickname}
-                    onClick={() => handleRowClick(p.nickname)}
-                    className="hover:bg-zinc-950/80 cursor-pointer transition-colors group"
+          <div className="overflow-x-auto rounded-2xl ring-1 ring-white/5">
+            <table className="w-full text-left text-xs text-zinc-300">
+              <thead className="bg-white/[0.02] text-zinc-500 uppercase font-mono text-[11px]">
+                <tr>
+                  <th className="py-3.5 px-4 font-semibold">#</th>
+                  <th className="py-3.5 px-4 font-semibold">플레이어 (이름)</th>
+                  <th
+                    onClick={() => handleSortToggle('matchesCount')}
+                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
                   >
-                    <td className="py-3 px-4 font-mono text-zinc-500 font-bold">
-                      #{idx + 1}
-                    </td>
-                    <td className="py-3 px-4 font-bold text-white group-hover:text-red-400 transition-colors text-sm">
-                      {p.nickname}
-                    </td>
-                    <td className="py-3 px-4 font-mono font-bold text-zinc-200">
-                      {p.matchesCount}판
-                    </td>
-                    <td className="py-3 px-4 font-mono font-extrabold text-emerald-400">
-                      {p.winRate}% <span className="text-[10px] font-normal text-zinc-400">({p.winsCount}승 {p.matchesCount - p.winsCount}패)</span>
-                    </td>
-                    <td className="py-3 px-4 font-mono font-bold text-amber-400 text-sm">
-                      {p.avgCombatScore}
-                    </td>
-                    <td className="py-3 px-4 font-mono">
-                      <span className="font-bold text-white text-sm">{p.avgKda}</span>
-                      <span className="text-[10px] text-zinc-500 block">
-                        ({p.totalKills} / {p.totalDeaths} / {p.totalAssists})
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="inline-flex items-center gap-1 text-xs text-red-400 group-hover:translate-x-1 transition-transform">
-                        <ChevronRight className="w-4 h-4" />
-                      </div>
+                    <div className="flex items-center gap-1">
+                      <span>판수 (경기 수)</span>
+                      <ArrowUpDown className="w-3 h-3" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleSortToggle('winRate')}
+                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>승률 (%)</span>
+                      <ArrowUpDown className="w-3 h-3" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleSortToggle('avgCombatScore')}
+                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>평균 전투 점수 (ACS)</span>
+                      <ArrowUpDown className="w-3 h-3" />
+                    </div>
+                  </th>
+                  <th
+                    onClick={() => handleSortToggle('avgKda')}
+                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>KDA</span>
+                      <ArrowUpDown className="w-3 h-3" />
+                    </div>
+                  </th>
+                  <th className="py-3.5 px-4 text-right font-semibold">상세</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 font-sans">
+                {filteredList.length > 0 ? (
+                  filteredList.map((p, idx) => (
+                    <tr
+                      key={p.nickname}
+                      onClick={() => handleRowClick(p.nickname)}
+                      className="hover:bg-white/[0.03] cursor-pointer transition-colors group"
+                    >
+                      <td className="py-3 px-4 font-mono text-zinc-500 font-bold">#{idx + 1}</td>
+                      <td className="py-3 px-4 font-semibold text-white group-hover:text-rose-400 transition-colors text-sm">
+                        {p.nickname}
+                      </td>
+                      <td className="py-3 px-4 font-mono font-bold text-zinc-200">{p.matchesCount}판</td>
+                      <td className="py-3 px-4 font-mono font-extrabold text-emerald-400">
+                        {p.winRate}% <span className="text-[10px] font-normal text-zinc-400">({p.winsCount}승 {p.matchesCount - p.winsCount}패)</span>
+                      </td>
+                      <td className="py-3 px-4 font-mono font-bold text-amber-400 text-sm">{p.avgCombatScore}</td>
+                      <td className="py-3 px-4 font-mono">
+                        <span className="font-bold text-white text-sm">{p.avgKda}</span>
+                        <span className="text-[10px] text-zinc-500 block">
+                          ({p.totalKills} / {p.totalDeaths} / {p.totalAssists})
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="inline-flex items-center gap-1 text-xs text-rose-400 group-hover:translate-x-1 transition-transform duration-500 ease-premium">
+                          <ChevronRight className="w-4 h-4" />
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={7} className="py-8 text-center text-zinc-500 font-mono">
+                      해당 요원을 사용한 기록이 있는 플레이어가 없습니다.
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="py-8 text-center text-zinc-500 font-mono">
-                    해당 요원을 사용한 기록이 있는 플레이어가 없습니다.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

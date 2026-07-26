@@ -2,94 +2,97 @@ import { AgentStat, PlayerProfile, MatchRecord, RoleInfo, CustomServer } from '.
 
 export const AGENT_PORTRAITS: Record<string, string> = {
   // Duelists (타격대)
-  jett: 'https://media.valorant-api.com/agents/e370fa57-4ba3-080b-95a3-00d22553455d/displayIcon.png',
-  제트: 'https://media.valorant-api.com/agents/e370fa57-4ba3-080b-95a3-00d22553455d/displayIcon.png',
+  jett: 'https://media.valorant-api.com/agents/add6443a-41bd-e414-f6ad-e58d267f4e95/displayicon.png',
+  제트: 'https://media.valorant-api.com/agents/add6443a-41bd-e414-f6ad-e58d267f4e95/displayicon.png',
 
-  phoenix: 'https://media.valorant-api.com/agents/eb93336a-4494-04b3-0a9a-a87a9b6b2151/displayIcon.png',
-  피닉스: 'https://media.valorant-api.com/agents/eb93336a-4494-04b3-0a9a-a87a9b6b2151/displayIcon.png',
+  phoenix: 'https://media.valorant-api.com/agents/eb93336a-449b-9c1b-0a54-a891f7921d69/displayicon.png',
+  피닉스: 'https://media.valorant-api.com/agents/eb93336a-449b-9c1b-0a54-a891f7921d69/displayicon.png',
 
-  reyna: 'https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayIcon.png',
-  레이나: 'https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayIcon.png',
+  reyna: 'https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayicon.png',
+  레이나: 'https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayicon.png',
 
-  raze: 'https://media.valorant-api.com/agents/f949a01d-488e-828b-39a5-e6992d88f3f9/displayIcon.png',
-  레이즈: 'https://media.valorant-api.com/agents/f949a01d-488e-828b-39a5-e6992d88f3f9/displayIcon.png',
+  raze: 'https://media.valorant-api.com/agents/f94c3b30-42be-e959-889c-5aa313dba261/displayicon.png',
+  레이즈: 'https://media.valorant-api.com/agents/f94c3b30-42be-e959-889c-5aa313dba261/displayicon.png',
 
-  yoru: 'https://media.valorant-api.com/agents/7f949027-479c-7e69-2109-eb0c31077520/displayIcon.png',
-  요루: 'https://media.valorant-api.com/agents/7f949027-479c-7e69-2109-eb0c31077520/displayIcon.png',
+  yoru: 'https://media.valorant-api.com/agents/7f94d92c-4234-0a36-9646-3a87eb8b5c89/displayicon.png',
+  요루: 'https://media.valorant-api.com/agents/7f94d92c-4234-0a36-9646-3a87eb8b5c89/displayicon.png',
 
-  neon: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd0-a775-be2309c0fc00/displayIcon.png',
-  네온: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd0-a775-be2309c0fc00/displayIcon.png',
+  neon: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd1-e765-15848195d751/displayicon.png',
+  네온: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd1-e765-15848195d751/displayicon.png',
 
-  iso: 'https://media.valorant-api.com/agents/0e38b54f-4576-9980-4998-d163d4db13a4/displayIcon.png',
-  아이소: 'https://media.valorant-api.com/agents/0e38b54f-4576-9980-4998-d163d4db13a4/displayIcon.png',
+  iso: 'https://media.valorant-api.com/agents/0e38b510-41a8-5780-5e8f-568b2a4f2d6c/displayicon.png',
+  아이소: 'https://media.valorant-api.com/agents/0e38b510-41a8-5780-5e8f-568b2a4f2d6c/displayicon.png',
 
-  waylay: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd0-a775-be2309c0fc00/displayIcon.png',
-  웨이레이: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd0-a775-be2309c0fc00/displayIcon.png',
+  waylay: 'https://media.valorant-api.com/agents/df1cb487-4902-002e-5c17-d28e83e78588/displayicon.png',
+  웨이레이: 'https://media.valorant-api.com/agents/df1cb487-4902-002e-5c17-d28e83e78588/displayicon.png',
 
   // Initiators (척후대)
-  sova: 'https://media.valorant-api.com/agents/320b2a48-4d9b-a075-30f2-f40ac9411b3d/displayIcon.png',
-  소바: 'https://media.valorant-api.com/agents/320b2a48-4d9b-a075-30f2-f40ac9411b3d/displayIcon.png',
+  sova: 'https://media.valorant-api.com/agents/320b2a48-4d9b-a075-30f1-1f93a9b638fa/displayicon.png',
+  소바: 'https://media.valorant-api.com/agents/320b2a48-4d9b-a075-30f1-1f93a9b638fa/displayicon.png',
 
-  fade: 'https://media.valorant-api.com/agents/ade69646-47a3-962d-a708-480bf1feb96a/displayIcon.png',
-  페이드: 'https://media.valorant-api.com/agents/ade69646-47a3-962d-a708-480bf1feb96a/displayIcon.png',
+  fade: 'https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/displayicon.png',
+  페이드: 'https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/displayicon.png',
 
-  breach: 'https://media.valorant-api.com/agents/5387da77-46e5-432c-a661-7001805778e3/displayIcon.png',
-  브리치: 'https://media.valorant-api.com/agents/5387da77-46e5-432c-a661-7001805778e3/displayIcon.png',
+  breach: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acf203c006/displayicon.png',
+  브리치: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acf203c006/displayicon.png',
 
-  skye: 'https://media.valorant-api.com/agents/6f2a04ca-43e0-be17-7f36-b3908627744d/displayIcon.png',
-  스카이: 'https://media.valorant-api.com/agents/6f2a04ca-43e0-be17-7f36-b3908627744d/displayIcon.png',
+  skye: 'https://media.valorant-api.com/agents/6f2a04ca-43e0-be17-7f36-b3908627744d/displayicon.png',
+  스카이: 'https://media.valorant-api.com/agents/6f2a04ca-43e0-be17-7f36-b3908627744d/displayicon.png',
 
-  kayo: 'https://media.valorant-api.com/agents/601e1e00-4ab5-bc49-4377-3b389216f516/displayIcon.png',
-  'kay/o': 'https://media.valorant-api.com/agents/601e1e00-4ab5-bc49-4377-3b389216f516/displayIcon.png',
-  '케이/오': 'https://media.valorant-api.com/agents/601e1e00-4ab5-bc49-4377-3b389216f516/displayIcon.png',
-  '케이오': 'https://media.valorant-api.com/agents/601e1e00-4ab5-bc49-4377-3b389216f516/displayIcon.png',
+  kayo: 'https://media.valorant-api.com/agents/601dbbe7-43ce-be57-2a40-4abd24953621/displayicon.png',
+  'kay/o': 'https://media.valorant-api.com/agents/601dbbe7-43ce-be57-2a40-4abd24953621/displayicon.png',
+  '케이/오': 'https://media.valorant-api.com/agents/601dbbe7-43ce-be57-2a40-4abd24953621/displayicon.png',
+  '케이오': 'https://media.valorant-api.com/agents/601dbbe7-43ce-be57-2a40-4abd24953621/displayicon.png',
 
-  gekko: 'https://media.valorant-api.com/agents/e28a11f2-4c0d-9372-a068-af2e7b349b7d/displayIcon.png',
-  게코: 'https://media.valorant-api.com/agents/e28a11f2-4c0d-9372-a068-af2e7b349b7d/displayIcon.png',
+  gekko: 'https://media.valorant-api.com/agents/e370fa57-4757-3604-3648-499e1f642d3f/displayicon.png',
+  게코: 'https://media.valorant-api.com/agents/e370fa57-4757-3604-3648-499e1f642d3f/displayicon.png',
+
+  tejo: 'https://media.valorant-api.com/agents/b444168c-4e35-8076-db47-ef9bf368f384/displayicon.png',
+  테호: 'https://media.valorant-api.com/agents/b444168c-4e35-8076-db47-ef9bf368f384/displayicon.png',
 
   // Controllers (전략가)
-  omen: 'https://media.valorant-api.com/agents/8e253930-4c05-31dd-1b6c-968525494517/displayIcon.png',
-  오멘: 'https://media.valorant-api.com/agents/8e253930-4c05-31dd-1b6c-968525494517/displayIcon.png',
+  omen: 'https://media.valorant-api.com/agents/8e253930-4c05-31dd-1b6c-968525494517/displayicon.png',
+  오멘: 'https://media.valorant-api.com/agents/8e253930-4c05-31dd-1b6c-968525494517/displayicon.png',
 
-  clove: 'https://media.valorant-api.com/agents/1dbf2cee-4001-43e9-0a63-094160d21e51/displayIcon.png',
-  클로브: 'https://media.valorant-api.com/agents/1dbf2cee-4001-43e9-0a63-094160d21e51/displayIcon.png',
+  clove: 'https://media.valorant-api.com/agents/1dbf2edd-4729-0984-3115-daa5eed44993/displayicon.png',
+  클로브: 'https://media.valorant-api.com/agents/1dbf2edd-4729-0984-3115-daa5eed44993/displayicon.png',
 
-  brimstone: 'https://media.valorant-api.com/agents/9f0d8027-4132-bfa9-122b-671022469ed0/displayIcon.png',
-  브림스톤: 'https://media.valorant-api.com/agents/9f0d8027-4132-bfa9-122b-671022469ed0/displayIcon.png',
+  brimstone: 'https://media.valorant-api.com/agents/9f0d8ba9-4140-b941-57d3-a7ad57c6b417/displayicon.png',
+  브림스톤: 'https://media.valorant-api.com/agents/9f0d8ba9-4140-b941-57d3-a7ad57c6b417/displayicon.png',
 
-  viper: 'https://media.valorant-api.com/agents/7077350d-4072-5012-0828-85f24c98e9a5/displayIcon.png',
-  바이퍼: 'https://media.valorant-api.com/agents/7077350d-4072-5012-0828-85f24c98e9a5/displayIcon.png',
+  viper: 'https://media.valorant-api.com/agents/707eab51-4836-f488-046a-cda6bf494859/displayicon.png',
+  바이퍼: 'https://media.valorant-api.com/agents/707eab51-4836-f488-046a-cda6bf494859/displayicon.png',
 
-  astra: 'https://media.valorant-api.com/agents/41fb69c1-4189-7b37-f117-bcaf1e96f1bf/displayIcon.png',
-  아스트라: 'https://media.valorant-api.com/agents/41fb69c1-4189-7b37-f117-bcaf1e96f1bf/displayIcon.png',
+  astra: 'https://media.valorant-api.com/agents/41fb69c1-4189-7b37-f117-bcaf1e96f1bf/displayicon.png',
+  아스트라: 'https://media.valorant-api.com/agents/41fb69c1-4189-7b37-f117-bcaf1e96f1bf/displayicon.png',
 
-  harbor: 'https://media.valorant-api.com/agents/2262947d-4730-8124-7705-905f5bda7739/displayIcon.png',
-  하버: 'https://media.valorant-api.com/agents/2262947d-4730-8124-7705-905f5bda7739/displayIcon.png',
+  harbor: 'https://media.valorant-api.com/agents/95b78ed7-4637-86d9-7e41-71ba8c293152/displayicon.png',
+  하버: 'https://media.valorant-api.com/agents/95b78ed7-4637-86d9-7e41-71ba8c293152/displayicon.png',
 
-  mix: 'https://media.valorant-api.com/agents/1dbf2cee-4001-43e9-0a63-094160d21e51/displayIcon.png',
-  믹스: 'https://media.valorant-api.com/agents/1dbf2cee-4001-43e9-0a63-094160d21e51/displayIcon.png',
+  miks: 'https://media.valorant-api.com/agents/7c8a4701-4de6-9355-b254-e09bc2a34b72/displayicon.png',
+  믹스: 'https://media.valorant-api.com/agents/7c8a4701-4de6-9355-b254-e09bc2a34b72/displayicon.png',
 
   // Sentinels (감시자)
-  chamber: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acef203c00/displayIcon.png',
-  체임버: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acef203c00/displayIcon.png',
+  chamber: 'https://media.valorant-api.com/agents/22697a3d-45bf-8dd7-4fec-84a9e28c69d7/displayicon.png',
+  체임버: 'https://media.valorant-api.com/agents/22697a3d-45bf-8dd7-4fec-84a9e28c69d7/displayicon.png',
 
-  killjoy: 'https://media.valorant-api.com/agents/1e58d92f-4950-0816-012e-a6122b4b41c0/displayIcon.png',
-  킬조이: 'https://media.valorant-api.com/agents/1e58d92f-4950-0816-012e-a6122b4b41c0/displayIcon.png',
+  killjoy: 'https://media.valorant-api.com/agents/1e58de9c-4950-5125-93e9-a0aee9f98746/displayicon.png',
+  킬조이: 'https://media.valorant-api.com/agents/1e58de9c-4950-5125-93e9-a0aee9f98746/displayicon.png',
 
-  cypher: 'https://media.valorant-api.com/agents/1172a791-4113-5757-fee0-867e286d8c80/displayIcon.png',
-  사이퍼: 'https://media.valorant-api.com/agents/1172a791-4113-5757-fee0-867e286d8c80/displayIcon.png',
+  cypher: 'https://media.valorant-api.com/agents/117ed9e3-49f3-6512-3ccf-0cada7e3823b/displayicon.png',
+  사이퍼: 'https://media.valorant-api.com/agents/117ed9e3-49f3-6512-3ccf-0cada7e3823b/displayicon.png',
 
-  sage: 'https://media.valorant-api.com/agents/568500d1-4572-5c0a-042c-f6e2a60397b2/displayIcon.png',
-  세이지: 'https://media.valorant-api.com/agents/568500d1-4572-5c0a-042c-f6e2a60397b2/displayIcon.png',
+  sage: 'https://media.valorant-api.com/agents/569fdd95-4d10-43ab-ca70-79becc718b46/displayicon.png',
+  세이지: 'https://media.valorant-api.com/agents/569fdd95-4d10-43ab-ca70-79becc718b46/displayicon.png',
 
-  deadlock: 'https://media.valorant-api.com/agents/cc8b02aa-4576-5252-0aea-8154131ee73d/displayIcon.png',
-  데드락: 'https://media.valorant-api.com/agents/cc8b02aa-4576-5252-0aea-8154131ee73d/displayIcon.png',
+  deadlock: 'https://media.valorant-api.com/agents/cc8b64c8-4b25-4ff9-6e7f-37b4da43d235/displayicon.png',
+  데드록: 'https://media.valorant-api.com/agents/cc8b64c8-4b25-4ff9-6e7f-37b4da43d235/displayicon.png',
 
-  vyse: 'https://media.valorant-api.com/agents/b13693e0-405e-85c8-1004-9c8e8a719942/displayIcon.png',
-  바이스: 'https://media.valorant-api.com/agents/b13693e0-405e-85c8-1004-9c8e8a719942/displayIcon.png',
+  vyse: 'https://media.valorant-api.com/agents/efba5359-4016-a1e5-7626-b1ae76895940/displayicon.png',
+  바이스: 'https://media.valorant-api.com/agents/efba5359-4016-a1e5-7626-b1ae76895940/displayicon.png',
 
-  veto: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acef203c00/displayIcon.png',
-  비토: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acef203c00/displayIcon.png',
+  veto: 'https://media.valorant-api.com/agents/92eeef5d-43b5-1d4a-8d03-b3927a09034b/displayicon.png',
+  비토: 'https://media.valorant-api.com/agents/92eeef5d-43b5-1d4a-8d03-b3927a09034b/displayicon.png',
 };
 
 export function getAgentPortraitUrl(agentName: string): string {
@@ -100,7 +103,7 @@ export function getAgentPortraitUrl(agentName: string): string {
   const found = Object.keys(AGENT_PORTRAITS).find((k) => key.includes(k) || k.includes(key));
   if (found) return AGENT_PORTRAITS[found];
 
-  return 'https://media.valorant-api.com/agents/e370fa57-4ba3-080b-95a3-00d22553455d/displayIcon.png';
+  return 'https://media.valorant-api.com/agents/add6443a-41bd-e414-f6ad-e58d267f4e95/displayicon.png';
 }
 
 export const ROLE_DEFINITIONS: Record<string, RoleInfo> = {
@@ -141,7 +144,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '제트',
     englishName: 'Jett',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/e370fa57-4ba3-080b-95a3-00d22553455d/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/add6443a-41bd-e414-f6ad-e58d267f4e95/displayicon.png',
     picksCount: 15,
     winsCount: 9,
     pickRate: 14.0,
@@ -154,7 +157,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '피닉스',
     englishName: 'Phoenix',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/eb93336a-4494-04b3-0a9a-a87a9b6b2151/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/eb93336a-449b-9c1b-0a54-a891f7921d69/displayicon.png',
     picksCount: 9,
     winsCount: 5,
     pickRate: 8.3,
@@ -167,7 +170,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '레이나',
     englishName: 'Reyna',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/a3bfb853-43b2-7238-a4f1-ad90e9e46bcc/displayicon.png',
     picksCount: 12,
     winsCount: 7,
     pickRate: 11.2,
@@ -180,7 +183,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '레이즈',
     englishName: 'Raze',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/f949a01d-488e-828b-39a5-e6992d88f3f9/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/f94c3b30-42be-e959-889c-5aa313dba261/displayicon.png',
     picksCount: 8,
     winsCount: 4,
     pickRate: 7.5,
@@ -193,7 +196,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '요루',
     englishName: 'Yoru',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/7f949027-479c-7e69-2109-eb0c31077520/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/7f94d92c-4234-0a36-9646-3a87eb8b5c89/displayicon.png',
     picksCount: 5,
     winsCount: 3,
     pickRate: 4.6,
@@ -206,7 +209,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '네온',
     englishName: 'Neon',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd0-a775-be2309c0fc00/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd1-e765-15848195d751/displayicon.png',
     picksCount: 6,
     winsCount: 4,
     pickRate: 5.5,
@@ -219,7 +222,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '아이소',
     englishName: 'Iso',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/0e38b54f-4576-9980-4998-d163d4db13a4/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/0e38b510-41a8-5780-5e8f-568b2a4f2d6c/displayicon.png',
     picksCount: 7,
     winsCount: 4,
     pickRate: 6.4,
@@ -232,7 +235,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '웨이레이',
     englishName: 'Waylay',
     role: '타격대',
-    portraitUrl: 'https://media.valorant-api.com/agents/bb2a4828-46eb-8cd0-a775-be2309c0fc00/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/df1cb487-4902-002e-5c17-d28e83e78588/displayicon.png',
     picksCount: 8,
     winsCount: 5,
     pickRate: 7.4,
@@ -247,7 +250,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '소바',
     englishName: 'Sova',
     role: '척후대',
-    portraitUrl: 'https://media.valorant-api.com/agents/320b2a48-4d9b-a075-30f2-f40ac9411b3d/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/320b2a48-4d9b-a075-30f1-1f93a9b638fa/displayicon.png',
     picksCount: 10,
     winsCount: 6,
     pickRate: 9.3,
@@ -260,7 +263,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '페이드',
     englishName: 'Fade',
     role: '척후대',
-    portraitUrl: 'https://media.valorant-api.com/agents/ade69646-47a3-962d-a708-480bf1feb96a/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/dade69b4-4f5a-8528-247b-219e5a1facd6/displayicon.png',
     picksCount: 9,
     winsCount: 6,
     pickRate: 8.3,
@@ -273,7 +276,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '브리치',
     englishName: 'Breach',
     role: '척후대',
-    portraitUrl: 'https://media.valorant-api.com/agents/5387da77-46e5-432c-a661-7001805778e3/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acf203c006/displayicon.png',
     picksCount: 6,
     winsCount: 3,
     pickRate: 5.5,
@@ -286,7 +289,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '스카이',
     englishName: 'Skye',
     role: '척후대',
-    portraitUrl: 'https://media.valorant-api.com/agents/6f2a04ca-43e0-be17-7f36-b3908627744d/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/6f2a04ca-43e0-be17-7f36-b3908627744d/displayicon.png',
     picksCount: 8,
     winsCount: 5,
     pickRate: 7.4,
@@ -299,7 +302,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '케이/오',
     englishName: 'KAY/O',
     role: '척후대',
-    portraitUrl: 'https://media.valorant-api.com/agents/601e1e00-4ab5-bc49-4377-3b389216f516/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/601dbbe7-43ce-be57-2a40-4abd24953621/displayicon.png',
     picksCount: 7,
     winsCount: 3,
     pickRate: 6.5,
@@ -312,13 +315,26 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '게코',
     englishName: 'Gekko',
     role: '척후대',
-    portraitUrl: 'https://media.valorant-api.com/agents/e28a11f2-4c0d-9372-a068-af2e7b349b7d/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/e370fa57-4757-3604-3648-499e1f642d3f/displayicon.png',
     picksCount: 11,
     winsCount: 7,
     pickRate: 10.2,
     winRate: 63.6,
     avgKda: 2.01,
     avgCombatScore: 225.0
+  },
+  {
+    id: 'tejo',
+    name: '테호',
+    englishName: 'Tejo',
+    role: '척후대',
+    portraitUrl: 'https://media.valorant-api.com/agents/b444168c-4e35-8076-db47-ef9bf368f384/displayicon.png',
+    picksCount: 6,
+    winsCount: 4,
+    pickRate: 5.6,
+    winRate: 66.7,
+    avgKda: 1.97,
+    avgCombatScore: 219.0
   },
 
   // Controllers (전략가)
@@ -327,7 +343,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '오멘',
     englishName: 'Omen',
     role: '전략가',
-    portraitUrl: 'https://media.valorant-api.com/agents/8e253930-4c05-31dd-1b6c-968525494517/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/8e253930-4c05-31dd-1b6c-968525494517/displayicon.png',
     picksCount: 14,
     winsCount: 8,
     pickRate: 13.0,
@@ -340,7 +356,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '클로브',
     englishName: 'Clove',
     role: '전략가',
-    portraitUrl: 'https://media.valorant-api.com/agents/1dbf2cee-4001-43e9-0a63-094160d21e51/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/1dbf2edd-4729-0984-3115-daa5eed44993/displayicon.png',
     picksCount: 10,
     winsCount: 8,
     pickRate: 9.3,
@@ -353,7 +369,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '브림스톤',
     englishName: 'Brimstone',
     role: '전략가',
-    portraitUrl: 'https://media.valorant-api.com/agents/9f0d8027-4132-bfa9-122b-671022469ed0/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/9f0d8ba9-4140-b941-57d3-a7ad57c6b417/displayicon.png',
     picksCount: 7,
     winsCount: 4,
     pickRate: 6.5,
@@ -366,7 +382,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '바이퍼',
     englishName: 'Viper',
     role: '전략가',
-    portraitUrl: 'https://media.valorant-api.com/agents/7077350d-4072-5012-0828-85f24c98e9a5/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/707eab51-4836-f488-046a-cda6bf494859/displayicon.png',
     picksCount: 9,
     winsCount: 5,
     pickRate: 8.3,
@@ -379,7 +395,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '아스트라',
     englishName: 'Astra',
     role: '전략가',
-    portraitUrl: 'https://media.valorant-api.com/agents/41fb69c1-4189-7b37-f117-bcaf1e96f1bf/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/41fb69c1-4189-7b37-f117-bcaf1e96f1bf/displayicon.png',
     picksCount: 4,
     winsCount: 2,
     pickRate: 3.7,
@@ -392,7 +408,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '하버',
     englishName: 'Harbor',
     role: '전략가',
-    portraitUrl: 'https://media.valorant-api.com/agents/2262947d-4730-8124-7705-905f5bda7739/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/95b78ed7-4637-86d9-7e41-71ba8c293152/displayicon.png',
     picksCount: 5,
     winsCount: 2,
     pickRate: 4.6,
@@ -401,11 +417,11 @@ export const INITIAL_AGENTS: AgentStat[] = [
     avgCombatScore: 182.0
   },
   {
-    id: 'mix',
+    id: 'miks',
     name: '믹스',
-    englishName: 'Mix',
+    englishName: 'Miks',
     role: '전략가',
-    portraitUrl: 'https://media.valorant-api.com/agents/1dbf2cee-4001-43e9-0a63-094160d21e51/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/7c8a4701-4de6-9355-b254-e09bc2a34b72/displayicon.png',
     picksCount: 7,
     winsCount: 4,
     pickRate: 6.5,
@@ -420,7 +436,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '체임버',
     englishName: 'Chamber',
     role: '감시자',
-    portraitUrl: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acef203c00/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/22697a3d-45bf-8dd7-4fec-84a9e28c69d7/displayicon.png',
     picksCount: 9,
     winsCount: 4,
     pickRate: 8.3,
@@ -433,7 +449,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '킬조이',
     englishName: 'Killjoy',
     role: '감시자',
-    portraitUrl: 'https://media.valorant-api.com/agents/1e58d92f-4950-0816-012e-a6122b4b41c0/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/1e58de9c-4950-5125-93e9-a0aee9f98746/displayicon.png',
     picksCount: 11,
     winsCount: 7,
     pickRate: 10.2,
@@ -446,7 +462,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '사이퍼',
     englishName: 'Cypher',
     role: '감시자',
-    portraitUrl: 'https://media.valorant-api.com/agents/1172a791-4113-5757-fee0-867e286d8c80/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/117ed9e3-49f3-6512-3ccf-0cada7e3823b/displayicon.png',
     picksCount: 10,
     winsCount: 6,
     pickRate: 9.3,
@@ -459,7 +475,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '세이지',
     englishName: 'Sage',
     role: '감시자',
-    portraitUrl: 'https://media.valorant-api.com/agents/568500d1-4572-5c0a-042c-f6e2a60397b2/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/569fdd95-4d10-43ab-ca70-79becc718b46/displayicon.png',
     picksCount: 8,
     winsCount: 5,
     pickRate: 7.4,
@@ -469,10 +485,10 @@ export const INITIAL_AGENTS: AgentStat[] = [
   },
   {
     id: 'deadlock',
-    name: '데드락',
+    name: '데드록',
     englishName: 'Deadlock',
     role: '감시자',
-    portraitUrl: 'https://media.valorant-api.com/agents/cc8b02aa-4576-5252-0aea-8154131ee73d/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/cc8b64c8-4b25-4ff9-6e7f-37b4da43d235/displayicon.png',
     picksCount: 4,
     winsCount: 2,
     pickRate: 3.7,
@@ -485,7 +501,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '바이스',
     englishName: 'Vyse',
     role: '감시자',
-    portraitUrl: 'https://media.valorant-api.com/agents/b13693e0-405e-85c8-1004-9c8e8a719942/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/efba5359-4016-a1e5-7626-b1ae76895940/displayicon.png',
     picksCount: 5,
     winsCount: 3,
     pickRate: 4.6,
@@ -498,7 +514,7 @@ export const INITIAL_AGENTS: AgentStat[] = [
     name: '비토',
     englishName: 'Veto',
     role: '감시자',
-    portraitUrl: 'https://media.valorant-api.com/agents/5f8d3a7f-467b-97f3-062c-13acef203c00/displayIcon.png',
+    portraitUrl: 'https://media.valorant-api.com/agents/92eeef5d-43b5-1d4a-8d03-b3927a09034b/displayicon.png',
     picksCount: 6,
     winsCount: 4,
     pickRate: 5.5,
@@ -683,9 +699,9 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
     joinedDate: '2024-11-02',
     recentAgents: ['소바', '페이드'],
     roleStats: {
-      타격대: { role: '타격대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 210, avgKda: 1.1, topAgents: [] },
-      감시자: { role: '감시자', matches: 1, wins: 1, winRate: 100, avgCombatScore: 240, avgKda: 1.7, topAgents: [] },
-      전략가: { role: '전략가', matches: 2, wins: 1, winRate: 50, avgCombatScore: 235, avgKda: 1.6, topAgents: [] },
+      타격대: { role: '타격대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 210, avgKda: 1.1, topAgents: [{ agentName: '제트', matches: 1, winRate: 0, kda: 1.1 }] },
+      감시자: { role: '감시자', matches: 1, wins: 1, winRate: 100, avgCombatScore: 240, avgKda: 1.7, topAgents: [{ agentName: '킬조이', matches: 1, winRate: 100, kda: 1.7 }] },
+      전략가: { role: '전략가', matches: 2, wins: 1, winRate: 50, avgCombatScore: 235, avgKda: 1.6, topAgents: [{ agentName: '오멘', matches: 2, winRate: 50, kda: 1.6 }] },
       척후대: {
         role: '척후대',
         matches: 6,
@@ -712,7 +728,7 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
     joinedDate: '2024-11-04',
     recentAgents: ['킬조이', '체임버'],
     roleStats: {
-      타격대: { role: '타격대', matches: 2, wins: 1, winRate: 50, avgCombatScore: 230, avgKda: 1.4, topAgents: [] },
+      타격대: { role: '타격대', matches: 2, wins: 1, winRate: 50, avgCombatScore: 230, avgKda: 1.4, topAgents: [{ agentName: '제트', matches: 2, winRate: 50, kda: 1.4 }] },
       감시자: {
         role: '감시자',
         matches: 9,
@@ -722,8 +738,8 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
         avgKda: 1.8,
         topAgents: [{ agentName: '킬조이', matches: 6, winRate: 67, kda: 1.9 }, { agentName: '체임버', matches: 3, winRate: 67, kda: 1.6 }]
       },
-      전략가: { role: '전략가', matches: 2, wins: 1, winRate: 50, avgCombatScore: 220, avgKda: 1.3, topAgents: [] },
-      척후대: { role: '척후대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 200, avgKda: 1.0, topAgents: [] }
+      전략가: { role: '전략가', matches: 2, wins: 1, winRate: 50, avgCombatScore: 220, avgKda: 1.3, topAgents: [{ agentName: '오멘', matches: 2, winRate: 50, kda: 1.3 }] },
+      척후대: { role: '척후대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 200, avgKda: 1.0, topAgents: [{ agentName: '소바', matches: 1, winRate: 0, kda: 1.0 }] }
     }
   },
   {
@@ -742,8 +758,8 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
     recentAgents: ['페이드', '제트'],
     roleStats: {
       타격대: { role: '타격대', matches: 4, wins: 2, winRate: 50, avgCombatScore: 280, avgKda: 1.7, topAgents: [{ agentName: '제트', matches: 4, winRate: 50, kda: 1.7 }] },
-      감시자: { role: '감시자', matches: 1, wins: 0, winRate: 0, avgCombatScore: 220, avgKda: 1.1, topAgents: [] },
-      전략가: { role: '전략가', matches: 1, wins: 1, winRate: 100, avgCombatScore: 240, avgKda: 1.5, topAgents: [] },
+      감시자: { role: '감시자', matches: 1, wins: 0, winRate: 0, avgCombatScore: 220, avgKda: 1.1, topAgents: [{ agentName: '킬조이', matches: 1, winRate: 0, kda: 1.1 }] },
+      전략가: { role: '전략가', matches: 1, wins: 1, winRate: 100, avgCombatScore: 240, avgKda: 1.5, topAgents: [{ agentName: '오멘', matches: 1, winRate: 100, kda: 1.5 }] },
       척후대: { role: '척후대', matches: 5, wins: 3, winRate: 60, avgCombatScore: 275, avgKda: 1.7, topAgents: [{ agentName: '페이드', matches: 5, winRate: 60, kda: 1.7 }] }
     }
   },
@@ -763,8 +779,8 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
     recentAgents: ['레이나', '피닉스'],
     roleStats: {
       타격대: { role: '타격대', matches: 7, wins: 3, winRate: 43, avgCombatScore: 240, avgKda: 1.3, topAgents: [{ agentName: '레이나', matches: 4, winRate: 50, kda: 1.3 }] },
-      감시자: { role: '감시자', matches: 1, wins: 1, winRate: 100, avgCombatScore: 210, avgKda: 1.2, topAgents: [] },
-      전략가: { role: '전략가', matches: 1, wins: 0, winRate: 0, avgCombatScore: 180, avgKda: 0.9, topAgents: [] },
+      감시자: { role: '감시자', matches: 1, wins: 1, winRate: 100, avgCombatScore: 210, avgKda: 1.2, topAgents: [{ agentName: '킬조이', matches: 1, winRate: 100, kda: 1.2 }] },
+      전략가: { role: '전략가', matches: 1, wins: 0, winRate: 0, avgCombatScore: 180, avgKda: 0.9, topAgents: [{ agentName: '오멘', matches: 1, winRate: 0, kda: 0.9 }] },
       척후대: { role: '척후대', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] }
     }
   },
@@ -783,10 +799,10 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
     joinedDate: '2024-11-08',
     recentAgents: ['오멘', '클로브'],
     roleStats: {
-      타격대: { role: '타격대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 190, avgKda: 0.9, topAgents: [] },
-      감시자: { role: '감시자', matches: 1, wins: 0, winRate: 0, avgCombatScore: 200, avgKda: 1.0, topAgents: [] },
+      타격대: { role: '타격대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 190, avgKda: 0.9, topAgents: [{ agentName: '제트', matches: 1, winRate: 0, kda: 0.9 }] },
+      감시자: { role: '감시자', matches: 1, wins: 0, winRate: 0, avgCombatScore: 200, avgKda: 1.0, topAgents: [{ agentName: '킬조이', matches: 1, winRate: 0, kda: 1.0 }] },
       전략가: { role: '전략가', matches: 10, wins: 5, winRate: 50, avgCombatScore: 230, avgKda: 1.4, topAgents: [{ agentName: '오멘', matches: 7, winRate: 43, kda: 1.4 }] },
-      척후대: { role: '척후대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 180, avgKda: 0.8, topAgents: [] }
+      척후대: { role: '척후대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 180, avgKda: 0.8, topAgents: [{ agentName: '소바', matches: 1, winRate: 0, kda: 0.8 }] }
     }
   },
   {
@@ -805,9 +821,9 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
     recentAgents: ['피닉스', '제트'],
     roleStats: {
       타격대: { role: '타격대', matches: 6, wins: 2, winRate: 33, avgCombatScore: 225, avgKda: 1.2, topAgents: [{ agentName: '피닉스', matches: 4, winRate: 25, kda: 1.2 }] },
-      감시자: { role: '감시자', matches: 1, wins: 1, winRate: 100, avgCombatScore: 190, avgKda: 1.1, topAgents: [] },
+      감시자: { role: '감시자', matches: 1, wins: 1, winRate: 100, avgCombatScore: 190, avgKda: 1.1, topAgents: [{ agentName: '킬조이', matches: 1, winRate: 100, kda: 1.1 }] },
       전략가: { role: '전략가', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
-      척후대: { role: '척후대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 180, avgKda: 0.9, topAgents: [] }
+      척후대: { role: '척후대', matches: 1, wins: 0, winRate: 0, avgCombatScore: 180, avgKda: 0.9, topAgents: [{ agentName: '소바', matches: 1, winRate: 0, kda: 0.9 }] }
     }
   },
   {
@@ -826,9 +842,9 @@ export const INITIAL_PLAYERS: PlayerProfile[] = [
     recentAgents: ['레이즈', '소바'],
     roleStats: {
       타격대: { role: '타격대', matches: 4, wins: 1, winRate: 25, avgCombatScore: 195, avgKda: 1.0, topAgents: [{ agentName: '레이즈', matches: 4, winRate: 25, kda: 1.0 }] },
-      감시자: { role: '감시자', matches: 1, wins: 0, winRate: 0, avgCombatScore: 170, avgKda: 0.8, topAgents: [] },
+      감시자: { role: '감시자', matches: 1, wins: 0, winRate: 0, avgCombatScore: 170, avgKda: 0.8, topAgents: [{ agentName: '킬조이', matches: 1, winRate: 0, kda: 0.8 }] },
       전략가: { role: '전략가', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
-      척후대: { role: '척후대', matches: 2, wins: 1, winRate: 50, avgCombatScore: 185, avgKda: 1.1, topAgents: [] }
+      척후대: { role: '척후대', matches: 2, wins: 1, winRate: 50, avgCombatScore: 185, avgKda: 1.1, topAgents: [{ agentName: '소바', matches: 2, winRate: 50, kda: 1.1 }] }
     }
   }
 ];
@@ -953,7 +969,9 @@ export const MOCK_CUSTOM_SERVERS: CustomServer[] = [
     operatorId: '이준혁테스트',
     activePlayersCount: 86,
     totalMatchesCount: 1402,
-    createdAt: '2024-10-15'
+    createdAt: '2024-10-15',
+    publicPassword: '1234',
+    adminPassword: 'admin1234'
   },
   {
     id: 'srv-2',
@@ -961,7 +979,9 @@ export const MOCK_CUSTOM_SERVERS: CustomServer[] = [
     operatorId: '레전드오퍼',
     activePlayersCount: 120,
     totalMatchesCount: 2340,
-    createdAt: '2024-09-20'
+    createdAt: '2024-09-20',
+    publicPassword: '1234',
+    adminPassword: 'admin1234'
   },
   {
     id: 'srv-3',
@@ -969,6 +989,8 @@ export const MOCK_CUSTOM_SERVERS: CustomServer[] = [
     operatorId: '발로짱',
     activePlayersCount: 45,
     totalMatchesCount: 512,
-    createdAt: '2024-11-01'
+    createdAt: '2024-11-01',
+    publicPassword: '1234',
+    adminPassword: 'admin1234'
   }
 ];

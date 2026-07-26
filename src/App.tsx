@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ViewTab, PlayerProfile, MatchRecord, AgentStat, CustomServer } from './types';
+import React, { useEffect, useState } from 'react';
+import { ViewTab, PlayerProfile, MatchRecord, MatchPlayer, AgentStat, CustomServer, RoleType, PlayerRoleStat } from './types';
 import { INITIAL_AGENTS, INITIAL_MATCHES, INITIAL_PLAYERS, MOCK_CUSTOM_SERVERS } from './data/mockData';
 import { HeaderNavigation } from './components/HeaderNavigation';
 import { LoginView } from './components/LoginView';
@@ -9,7 +9,209 @@ import { LeaderboardView } from './components/LeaderboardView';
 import { UploadMatchView } from './components/UploadMatchView';
 import { AdminPanelModal } from './components/AdminPanelModal';
 import { PlayerProfileModal } from './components/PlayerProfileModal';
+import { MatchDetailModal } from './components/MatchDetailModal';
 import { CreateServerModal } from './components/CreateServerModal';
+import { AmbientBackground } from './components/AmbientBackground';
+
+const DEMO_SERVER_ID = 'srv-1';
+// v2: CustomServer now carries publicPassword/adminPassword.
+// v3: agent roster portrait URLs/names corrected (Veto, Miks) in mockData.
+// Bump the key on any change to the seeded shape so stale cached copies don't shadow it.
+const STORAGE_KEY_SERVERS = 'vanguard-tactical:servers:v3';
+const STORAGE_KEY_SERVER_DATA = 'vanguard-tactical:server-data:v3';
+
+interface ServerData {
+  players: PlayerProfile[];
+  matches: MatchRecord[];
+  agents: AgentStat[];
+}
+
+const EMPTY_ROLE_STATS: Record<RoleType, PlayerRoleStat> = {
+  타격대: { role: '타격대', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
+  감시자: { role: '감시자', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
+  전략가: { role: '전략가', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
+  척후대: { role: '척후대', matches: 0, wins: 0, winRate: 0, avgCombatScore: 0, avgKda: 0, topAgents: [] },
+};
+
+// Same character roster, but every stat zeroed out for a brand new server.
+const emptyAgentRoster = (): AgentStat[] =>
+  INITIAL_AGENTS.map((a) => ({
+    ...a,
+    picksCount: 0,
+    winsCount: 0,
+    pickRate: 0,
+    winRate: 0,
+    avgKda: 0,
+    avgCombatScore: 0,
+  }));
+
+// A player uploaded in a match that has no existing profile yet gets a fresh one.
+const createPlayerFromMatch = (p: MatchPlayer): PlayerProfile => {
+  const kda = p.deaths > 0 ? Number(((p.kills + p.assists) / p.deaths).toFixed(2)) : p.kills + p.assists;
+  const roleStats: Record<RoleType, PlayerRoleStat> = {
+    ...EMPTY_ROLE_STATS,
+    [p.role]: {
+      role: p.role,
+      matches: 1,
+      wins: p.isWin ? 1 : 0,
+      winRate: p.isWin ? 100 : 0,
+      avgCombatScore: p.combatScore,
+      avgKda: kda,
+      topAgents: [{ agentName: p.agent, matches: 1, winRate: p.isWin ? 100 : 0, kda }],
+    },
+  };
+
+  return {
+    id: `p-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    nickname: p.nickname,
+    matchesCount: 1,
+    wins: p.isWin ? 1 : 0,
+    winRate: p.isWin ? 100 : 0,
+    avgCombatScore: p.combatScore,
+    totalKills: p.kills,
+    totalDeaths: p.deaths,
+    totalAssists: p.assists,
+    avgKda: kda,
+    joinedDate: new Date().toISOString().split('T')[0],
+    recentAgents: [p.agent],
+    roleStats,
+    rank: 0,
+  };
+};
+
+// Merges one match's result into an existing player's aggregate + per-role + per-agent stats.
+const applyMatchToPlayer = (player: PlayerProfile, p: MatchPlayer): PlayerProfile => {
+  const matchKda = p.deaths > 0 ? (p.kills + p.assists) / p.deaths : p.kills + p.assists;
+
+  const prevRole = player.roleStats[p.role] || EMPTY_ROLE_STATS[p.role];
+  const roleMatches = prevRole.matches + 1;
+  const roleWins = prevRole.wins + (p.isWin ? 1 : 0);
+  const roleAvgCombatScore = Math.round((prevRole.avgCombatScore * prevRole.matches + p.combatScore) / roleMatches);
+  const roleAvgKda = Number((((prevRole.avgKda * prevRole.matches) + matchKda) / roleMatches).toFixed(2));
+
+  const agentIdx = prevRole.topAgents.findIndex((a) => a.agentName === p.agent);
+  const topAgents = [...prevRole.topAgents];
+  if (agentIdx >= 0) {
+    const prevAgent = topAgents[agentIdx];
+    const agentMatches = prevAgent.matches + 1;
+    const agentWins = Math.round((prevAgent.winRate / 100) * prevAgent.matches) + (p.isWin ? 1 : 0);
+    topAgents[agentIdx] = {
+      agentName: p.agent,
+      matches: agentMatches,
+      winRate: Math.round((agentWins / agentMatches) * 100),
+      kda: Number((((prevAgent.kda * prevAgent.matches) + matchKda) / agentMatches).toFixed(2)),
+    };
+  } else {
+    topAgents.push({ agentName: p.agent, matches: 1, winRate: p.isWin ? 100 : 0, kda: Number(matchKda.toFixed(2)) });
+  }
+  topAgents.sort((a, b) => b.matches - a.matches);
+
+  const totalKills = player.totalKills + p.kills;
+  const totalDeaths = player.totalDeaths + p.deaths;
+  const totalAssists = player.totalAssists + p.assists;
+  const matchesCount = player.matchesCount + 1;
+  const wins = player.wins + (p.isWin ? 1 : 0);
+
+  return {
+    ...player,
+    matchesCount,
+    wins,
+    totalKills,
+    totalDeaths,
+    totalAssists,
+    winRate: Math.round((wins / matchesCount) * 100),
+    avgCombatScore: Math.round((player.avgCombatScore * (matchesCount - 1) + p.combatScore) / matchesCount),
+    avgKda: Number(((totalKills + totalAssists) / Math.max(1, totalDeaths)).toFixed(2)),
+    recentAgents: Array.from(new Set([p.agent, ...player.recentAgents])).slice(0, 3),
+    roleStats: {
+      ...player.roleStats,
+      [p.role]: {
+        role: p.role,
+        matches: roleMatches,
+        wins: roleWins,
+        winRate: Math.round((roleWins / roleMatches) * 100),
+        avgCombatScore: roleAvgCombatScore,
+        avgKda: roleAvgKda,
+        topAgents,
+      },
+    },
+  };
+};
+
+// Recomputes the agent roster's picks/wins/rates from every player in a newly added match.
+const applyMatchToAgentRoster = (agents: AgentStat[], matchPlayers: MatchPlayer[]): AgentStat[] => {
+  const updated = agents.map((a) => ({ ...a }));
+  matchPlayers.forEach((p) => {
+    const idx = updated.findIndex((a) => a.name === p.agent);
+    if (idx === -1) return; // unrecognized agent name — leave roster untouched rather than guess
+    const a = updated[idx];
+    const matchKda = p.deaths > 0 ? (p.kills + p.assists) / p.deaths : p.kills + p.assists;
+    const picksCount = a.picksCount + 1;
+    const winsCount = a.winsCount + (p.isWin ? 1 : 0);
+    updated[idx] = {
+      ...a,
+      picksCount,
+      winsCount,
+      winRate: Number(((winsCount / picksCount) * 100).toFixed(1)),
+      avgKda: Number((((a.avgKda * a.picksCount) + matchKda) / picksCount).toFixed(2)),
+      avgCombatScore: Number((((a.avgCombatScore * a.picksCount) + p.combatScore) / picksCount).toFixed(1)),
+    };
+  });
+  const totalPicks = updated.reduce((sum, a) => sum + a.picksCount, 0) || 1;
+  return updated.map((a) => ({ ...a, pickRate: Number(((a.picksCount / totalPicks) * 100).toFixed(1)) }));
+};
+
+function loadServers(): CustomServer[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_SERVERS);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // fall through to defaults
+  }
+  return MOCK_CUSTOM_SERVERS;
+}
+
+// Re-applies mockData's canonical static agent fields (name/portrait/role) onto cached
+// per-server stats, so a mockData.ts fix (portrait URL, renamed agent) shows up immediately
+// without waiting on a storage-key version bump. Only picks/wins/rates carry over from cache.
+const reconcileAgents = (cachedAgents: AgentStat[] | undefined): AgentStat[] => {
+  const cachedById = new Map((cachedAgents || []).map((a) => [a.id, a]));
+  return INITIAL_AGENTS.map((canonical) => {
+    const cached = cachedById.get(canonical.id);
+    return {
+      ...canonical,
+      picksCount: cached?.picksCount ?? 0,
+      winsCount: cached?.winsCount ?? 0,
+      pickRate: cached?.pickRate ?? 0,
+      winRate: cached?.winRate ?? 0,
+      avgKda: cached?.avgKda ?? 0,
+      avgCombatScore: cached?.avgCombatScore ?? 0,
+    };
+  });
+};
+
+function loadServerDataMap(servers: CustomServer[]): Record<string, ServerData> {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_SERVER_DATA);
+    if (raw) {
+      const parsed: Record<string, ServerData> = JSON.parse(raw);
+      Object.keys(parsed).forEach((id) => {
+        parsed[id] = { ...parsed[id], agents: reconcileAgents(parsed[id].agents) };
+      });
+      return parsed;
+    }
+  } catch {
+    // fall through to defaults
+  }
+  const map: Record<string, ServerData> = {};
+  servers.forEach((s) => {
+    map[s.id] =
+      s.id === DEMO_SERVER_ID
+        ? { players: INITIAL_PLAYERS, matches: INITIAL_MATCHES, agents: INITIAL_AGENTS }
+        : { players: [], matches: [], agents: emptyAgentRoster() };
+  });
+  return map;
+}
 
 // Helper to sort and recalculate sequential ranks (1, 2, 3, ...) for players
 export const sortAndRankPlayers = (playerList: PlayerProfile[]): PlayerProfile[] => {
@@ -29,23 +231,52 @@ export const sortAndRankPlayers = (playerList: PlayerProfile[]): PlayerProfile[]
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<ViewTab>('dashboard');
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(true);
-  const [serverName, setServerName] = useState<string>('이준혁테스트');
-  const [operatorId, setOperatorId] = useState<string>('이준혁테스트');
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [serverName, setServerName] = useState<string>('');
+  const [operatorId, setOperatorId] = useState<string>('');
 
-  const [matches, setMatches] = useState<MatchRecord[]>(INITIAL_MATCHES);
-  const [players, setPlayers] = useState<PlayerProfile[]>(INITIAL_PLAYERS);
-  const [agents, setAgents] = useState<AgentStat[]>(INITIAL_AGENTS);
-  const [servers, setServers] = useState<CustomServer[]>(MOCK_CUSTOM_SERVERS);
+  const [servers, setServers] = useState<CustomServer[]>(() => loadServers());
+  const [serverDataMap, setServerDataMap] = useState<Record<string, ServerData>>(() =>
+    loadServerDataMap(loadServers())
+  );
+  const [currentServerId, setCurrentServerId] = useState<string>('');
 
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerProfile | null>(null);
+  const [selectedMatch, setSelectedMatch] = useState<MatchRecord | null>(null);
   const [isCreateServerOpen, setIsCreateServerOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_SERVERS, JSON.stringify(servers));
+  }, [servers]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY_SERVER_DATA, JSON.stringify(serverDataMap));
+  }, [serverDataMap]);
+
+  useEffect(() => {
+    if (currentTab === 'admin' && !isAdmin) {
+      setCurrentTab('dashboard');
+    }
+  }, [currentTab, isAdmin]);
+
+  const { players = [], matches = [], agents = [] } = serverDataMap[currentServerId] || {};
+
+  const updateCurrentServerData = (updater: (data: ServerData) => ServerData) => {
+    setServerDataMap((prev) => ({
+      ...prev,
+      [currentServerId]: updater(prev[currentServerId] || { players: [], matches: [], agents: [] }),
+    }));
+  };
+
   // Handle Login
-  const handleLoginSuccess = (selectedSrv: string, opId: string) => {
+  const handleLoginSuccess = (selectedSrv: string, opId: string, admin: boolean) => {
+    const target = servers.find((s) => s.name === selectedSrv);
     setServerName(selectedSrv);
     setOperatorId(opId);
+    setCurrentServerId(target?.id || '');
+    setIsAdmin(admin);
     setIsLoggedIn(true);
     setCurrentTab('dashboard');
   };
@@ -53,105 +284,104 @@ export function App() {
   // Handle Logout
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setIsAdmin(false);
     setCurrentTab('login');
   };
 
   // Add Match from AI Screenshot Scanner
   const handleAddMatch = (newMatch: MatchRecord) => {
-    setMatches((prev) => [newMatch, ...prev]);
+    updateCurrentServerData((data) => {
+      const updatedMatches = [newMatch, ...data.matches];
+      const updatedPlayers = data.players.map((player) => ({ ...player }));
 
-    // Update Player stats dynamically
-    if (newMatch.players && newMatch.players.length > 0) {
-      setPlayers((prevPlayers) => {
-        const updated = prevPlayers.map((player) => ({ ...player }));
-        newMatch.players.forEach((p) => {
-          const existing = updated.find((x) => x.nickname === p.nickname);
-          if (existing) {
-            existing.matchesCount += 1;
-            if (p.isWin) existing.wins += 1;
-            existing.totalKills += p.kills;
-            existing.totalDeaths += p.deaths;
-            existing.totalAssists += p.assists;
-            existing.winRate = Math.round((existing.wins / existing.matchesCount) * 100);
-            existing.avgCombatScore = Math.round(
-              (existing.avgCombatScore * (existing.matchesCount - 1) + p.combatScore) / existing.matchesCount
-            );
-            existing.avgKda = Number(
-              ((existing.totalKills + existing.totalAssists) / Math.max(1, existing.totalDeaths)).toFixed(2)
-            );
-          }
-        });
-        return sortAndRankPlayers(updated);
+      newMatch.players?.forEach((p) => {
+        const existingIdx = updatedPlayers.findIndex((x) => x.nickname === p.nickname);
+        if (existingIdx >= 0) {
+          updatedPlayers[existingIdx] = applyMatchToPlayer(updatedPlayers[existingIdx], p);
+        } else {
+          updatedPlayers.push(createPlayerFromMatch(p));
+        }
       });
-    }
+
+      return {
+        ...data,
+        matches: updatedMatches,
+        players: sortAndRankPlayers(updatedPlayers),
+        agents: applyMatchToAgentRoster(data.agents, newMatch.players || []),
+      };
+    });
   };
 
   // Update Player Nickname
   const handleUpdateNickname = (playerId: string, newName: string) => {
-    setPlayers((prev) =>
-      prev.map((p) => (p.id === playerId ? { ...p, nickname: newName } : p))
-    );
+    updateCurrentServerData((data) => ({
+      ...data,
+      players: data.players.map((p) => (p.id === playerId ? { ...p, nickname: newName } : p)),
+    }));
   };
 
   // Merge Player Records
   const handleMergePlayers = (sourceId: string, targetId: string) => {
     const source = players.find((p) => p.id === sourceId);
     const target = players.find((p) => p.id === targetId);
+    if (!source || !target) return;
 
-    if (source && target) {
-      setPlayers((prev) => {
-        const mergedList = prev
-          .filter((p) => p.id !== sourceId)
-          .map((p) => {
-            if (p.id === targetId) {
-              const newMatches = p.matchesCount + source.matchesCount;
-              const newWins = p.wins + source.wins;
-              const newKills = p.totalKills + source.totalKills;
-              const newDeaths = p.totalDeaths + source.totalDeaths;
-              const newAssists = p.totalAssists + source.totalAssists;
-              const newWinRate = newMatches > 0 ? Math.round((newWins / newMatches) * 100) : 0;
-              const newAvgKda = Number(
-                ((newKills + newAssists) / Math.max(1, newDeaths)).toFixed(2)
-              );
-              const newAvgCombatScore = newMatches > 0
-                ? Math.round((p.avgCombatScore * p.matchesCount + source.avgCombatScore * source.matchesCount) / newMatches)
-                : p.avgCombatScore;
+    updateCurrentServerData((data) => {
+      const mergedList = data.players
+        .filter((p) => p.id !== sourceId)
+        .map((p) => {
+          if (p.id !== targetId) return p;
 
-              const combinedAgents = Array.from(
-                new Set([...p.recentAgents, ...source.recentAgents])
-              ).slice(0, 3);
+          const newMatches = p.matchesCount + source.matchesCount;
+          const newWins = p.wins + source.wins;
+          const newKills = p.totalKills + source.totalKills;
+          const newDeaths = p.totalDeaths + source.totalDeaths;
+          const newAssists = p.totalAssists + source.totalAssists;
+          const newWinRate = newMatches > 0 ? Math.round((newWins / newMatches) * 100) : 0;
+          const newAvgKda = Number(((newKills + newAssists) / Math.max(1, newDeaths)).toFixed(2));
+          const newAvgCombatScore =
+            newMatches > 0
+              ? Math.round((p.avgCombatScore * p.matchesCount + source.avgCombatScore * source.matchesCount) / newMatches)
+              : p.avgCombatScore;
+          const combinedAgents = Array.from(new Set([...p.recentAgents, ...source.recentAgents])).slice(0, 3);
 
-              return {
-                ...p,
-                matchesCount: newMatches,
-                wins: newWins,
-                winRate: newWinRate,
-                avgKda: newAvgKda,
-                avgCombatScore: newAvgCombatScore,
-                totalKills: newKills,
-                totalDeaths: newDeaths,
-                totalAssists: newAssists,
-                recentAgents: combinedAgents,
-              };
-            }
-            return p;
-          });
+          return {
+            ...p,
+            matchesCount: newMatches,
+            wins: newWins,
+            winRate: newWinRate,
+            avgKda: newAvgKda,
+            avgCombatScore: newAvgCombatScore,
+            totalKills: newKills,
+            totalDeaths: newDeaths,
+            totalAssists: newAssists,
+            recentAgents: combinedAgents,
+          };
+        });
 
-        return sortAndRankPlayers(mergedList);
-      });
-    }
+      return { ...data, players: sortAndRankPlayers(mergedList) };
+    });
   };
 
   // Delete Match Record
   const handleDeleteMatch = (matchId: string) => {
-    setMatches((prev) => prev.filter((m) => m.id !== matchId));
+    updateCurrentServerData((data) => ({
+      ...data,
+      matches: data.matches.filter((m) => m.id !== matchId),
+    }));
   };
 
-  // Create New Server
+  // Create New Server — gets its own isolated (empty) dataset, never shares with other servers.
   const handleCreateServer = (newServer: CustomServer) => {
     setServers((prev) => [newServer, ...prev]);
+    setServerDataMap((prev) => ({
+      ...prev,
+      [newServer.id]: { players: [], matches: [], agents: emptyAgentRoster() },
+    }));
     setServerName(newServer.name);
     setOperatorId(newServer.operatorId);
+    setCurrentServerId(newServer.id);
+    setIsAdmin(true); // the creator set the admin password, so they start as admin
     setIsLoggedIn(true);
     setCurrentTab('dashboard');
   };
@@ -159,6 +389,7 @@ export function App() {
   if (!isLoggedIn || currentTab === 'login') {
     return (
       <>
+        <AmbientBackground />
         <LoginView
           servers={servers}
           onLoginSuccess={handleLoginSuccess}
@@ -174,13 +405,15 @@ export function App() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-red-500 selection:text-white">
+    <div className="min-h-dvh text-zinc-100 flex flex-col font-sans selection:bg-rose-500 selection:text-white">
+      <AmbientBackground />
       {/* Header Navigation */}
       <HeaderNavigation
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         serverName={serverName}
         operatorId={operatorId}
+        isAdmin={isAdmin}
         onLogout={handleLogout}
         onOpenCreateServer={() => setIsCreateServerOpen(true)}
         searchQuery={searchQuery}
@@ -197,10 +430,13 @@ export function App() {
           <DashboardView
             serverName={serverName}
             operatorId={operatorId}
+            totalMatchesCount={matches.length}
+            activePlayersCount={players.length}
             matches={matches}
             players={players}
             agents={agents}
             onSelectPlayer={(p) => setSelectedPlayer(p)}
+            onSelectMatch={(m) => setSelectedMatch(m)}
             onNavigateToUpload={() => setCurrentTab('upload')}
             onNavigateToLeaderboard={() => setCurrentTab('leaderboard')}
           />
@@ -218,6 +454,7 @@ export function App() {
         {currentTab === 'leaderboard' && (
           <LeaderboardView
             players={players}
+            totalMatchesCount={matches.length}
             onSelectPlayer={(p) => setSelectedPlayer(p)}
           />
         )}
@@ -229,7 +466,7 @@ export function App() {
           />
         )}
 
-        {currentTab === 'admin' && (
+        {currentTab === 'admin' && isAdmin && (
           <AdminPanelModal
             players={players}
             matches={matches}
@@ -244,6 +481,12 @@ export function App() {
       <PlayerProfileModal
         player={selectedPlayer}
         onClose={() => setSelectedPlayer(null)}
+      />
+
+      {/* Match Detail Modal */}
+      <MatchDetailModal
+        match={selectedMatch}
+        onClose={() => setSelectedMatch(null)}
       />
 
       {/* Create Server Modal */}

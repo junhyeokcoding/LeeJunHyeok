@@ -79,6 +79,8 @@ export interface CustomServer {
   activePlayersCount: number;
   totalMatchesCount: number;
   createdAt: string;
+  publicPassword: string;
+  adminPassword: string;
 }
 
 export type ViewTab =
