@@ -108,6 +108,20 @@ app.delete("/api/servers/:id", (req, res) => {
   res.json({ success: true });
 });
 
+// Ground truth for agent → role: OCR reads only the agent icon off the scoreboard,
+// so trust that lookup over Claude's independent (and unreliable) role guess.
+const AGENT_ROLE_MAP: Record<string, string> = Object.fromEntries(
+  INITIAL_AGENTS.map((a) => [a.name, a.role])
+);
+
+function reconcilePlayerRoles(matchData: any) {
+  for (const p of matchData?.players || []) {
+    const knownRole = AGENT_ROLE_MAP[p.agent?.trim()];
+    if (knownRole) p.role = knownRole;
+  }
+  return matchData;
+}
+
 // Initialize Claude client (lazy/guarded on server)
 const getClaudeClient = () => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -231,7 +245,7 @@ Set isWin for all 10 players using this rule.`,
       throw new Error("Empty response from Claude");
     }
 
-    const matchData = JSON.parse(textBlock.text);
+    const matchData = reconcilePlayerRoles(JSON.parse(textBlock.text));
     return res.json({ success: true, isSimulated: false, matchData });
 
   } catch (error: any) {
