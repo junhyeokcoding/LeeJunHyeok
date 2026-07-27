@@ -113,6 +113,9 @@ const applyMatchToPlayer = (player: PlayerProfile, p: MatchPlayer): PlayerProfil
 };
 
 // Recomputes the agent roster's picks/wins/rates from every player in a newly added match.
+// pickRate = this agent's picks / total agent picks across the whole roster (10 per match) — bounded
+// 0-100% by construction, unlike a per-match "picked in X% of matches" rate which can exceed 100%
+// when both teams in the same match pick the same agent.
 const applyMatchToAgentRoster = (agents: AgentStat[], matchPlayers: MatchPlayer[]): AgentStat[] => {
   const updated = agents.map((a) => ({ ...a }));
   matchPlayers.forEach((p) => {

@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { AgentStat, MatchRecord, PlayerProfile, RoleType } from '../types';
 import { RoleIcon } from './RoleIcon';
 import { AgentPlayerUsageModal } from './AgentPlayerUsageModal';
-import { Users, Filter, ArrowUpDown, Flame, Crosshair, ChevronRight } from 'lucide-react';
+import { Users, Filter, ArrowUpDown, ArrowUp, ArrowDown, Flame, Crosshair, ChevronRight } from 'lucide-react';
 
 interface AgentStatsViewProps {
   agents: AgentStat[];
@@ -40,6 +40,11 @@ export const AgentStatsView: React.FC<AgentStatsViewProps> = ({
       const mult = sortDirection === 'desc' ? -1 : 1;
       return (a[sortField] - b[sortField]) * mult;
     });
+
+  const renderSortIcon = (field: typeof sortField) => {
+    if (sortField !== field) return <ArrowUpDown className="w-3 h-3" />;
+    return sortDirection === 'desc' ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />;
+  };
 
   const handleSortToggle = (field: typeof sortField) => {
     if (sortField === field) {
@@ -105,7 +110,7 @@ export const AgentStatsView: React.FC<AgentStatsViewProps> = ({
                   <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full"
-                      style={{ width: `${agent.pickRate * 5}%` }}
+                      style={{ width: `${agent.pickRate}%` }}
                     />
                   </div>
                 </div>
@@ -196,38 +201,46 @@ export const AgentStatsView: React.FC<AgentStatsViewProps> = ({
                   <th className="py-3.5 px-4 font-semibold">포지션 (Role)</th>
                   <th
                     onClick={() => handleSortToggle('pickRate')}
-                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
+                    className={`py-3.5 px-4 font-semibold cursor-pointer select-none ${
+                      sortField === 'pickRate' ? 'text-rose-400' : 'hover:text-white'
+                    }`}
                   >
                     <div className="flex items-center gap-1">
                       <span>픽률 %</span>
-                      <ArrowUpDown className="w-3 h-3" />
+                      {renderSortIcon('pickRate')}
                     </div>
                   </th>
                   <th
                     onClick={() => handleSortToggle('winRate')}
-                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
+                    className={`py-3.5 px-4 font-semibold cursor-pointer select-none ${
+                      sortField === 'winRate' ? 'text-rose-400' : 'hover:text-white'
+                    }`}
                   >
                     <div className="flex items-center gap-1">
                       <span>승률 %</span>
-                      <ArrowUpDown className="w-3 h-3" />
+                      {renderSortIcon('winRate')}
                     </div>
                   </th>
                   <th
                     onClick={() => handleSortToggle('avgKda')}
-                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
+                    className={`py-3.5 px-4 font-semibold cursor-pointer select-none ${
+                      sortField === 'avgKda' ? 'text-rose-400' : 'hover:text-white'
+                    }`}
                   >
                     <div className="flex items-center gap-1">
                       <span>평균 KDA</span>
-                      <ArrowUpDown className="w-3 h-3" />
+                      {renderSortIcon('avgKda')}
                     </div>
                   </th>
                   <th
                     onClick={() => handleSortToggle('avgCombatScore')}
-                    className="py-3.5 px-4 font-semibold cursor-pointer hover:text-white"
+                    className={`py-3.5 px-4 font-semibold cursor-pointer select-none ${
+                      sortField === 'avgCombatScore' ? 'text-rose-400' : 'hover:text-white'
+                    }`}
                   >
                     <div className="flex items-center gap-1">
                       <span>ACS (전투점수)</span>
-                      <ArrowUpDown className="w-3 h-3" />
+                      {renderSortIcon('avgCombatScore')}
                     </div>
                   </th>
                   <th className="py-3.5 px-4 text-right font-semibold">사용자 목록</th>
