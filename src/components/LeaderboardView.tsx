@@ -25,7 +25,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   onSelectPlayer,
 }) => {
   const [filterQuery, setFilterQuery] = useState<string>('');
-  type SortableField = 'winRate' | 'avgCombatScore' | 'avgKda';
+  type SortableField = 'winRate' | 'avgCombatScore' | 'avgKda' | 'matchesCount';
   const [sortField, setSortField] = useState<SortableField | null>(null);
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
 
@@ -40,7 +40,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     }
   };
 
-  // Default: global rank ascending (same order the rank badge reflects). Clicking 승률/ACS/KDA cycles desc -> asc -> back to default.
+  // Default: global rank ascending (same order the rank badge reflects). Clicking 총경기수/승률/ACS/KDA cycles desc -> asc -> back to default.
   const sortedPlayers = [...players].sort((a, b) => {
     if (sortField) {
       const mult = sortDirection === 'desc' ? -1 : 1;
@@ -165,7 +165,21 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                 <tr>
                   <th className="py-3.5 px-4 font-semibold">순위</th>
                   <th className="py-3.5 px-4 font-semibold">플레이어 (닉네임)</th>
-                  <th className="py-3.5 px-4 font-semibold">총 경기 수</th>
+                  <th
+                    onClick={() => handleSortClick('matchesCount')}
+                    className={`py-3.5 px-4 font-semibold cursor-pointer select-none ${
+                      sortField === 'matchesCount' ? 'text-rose-400' : 'hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>총 경기 수</span>
+                      {sortField === 'matchesCount' ? (
+                        sortDirection === 'desc' ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3" />
+                      )}
+                    </div>
+                  </th>
                   <th
                     onClick={() => handleSortClick('winRate')}
                     className={`py-3.5 px-4 font-semibold cursor-pointer select-none ${
