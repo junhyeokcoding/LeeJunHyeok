@@ -16,6 +16,7 @@ import {
   User,
   Crosshair,
   Menu,
+  Info,
 } from 'lucide-react';
 import { RoleIcon } from './RoleIcon';
 
@@ -62,6 +63,7 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNoticeOpen, setIsNoticeOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   const navItems = NAV_ITEMS.filter((item) => item.tab !== 'admin' || isAdmin);
@@ -170,6 +172,15 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
                   );
                 })}
               </nav>
+
+              {/* Notice popover trigger */}
+              <button
+                onClick={() => setIsNoticeOpen(true)}
+                className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[11px] font-medium text-zinc-500 hover:text-zinc-200 hover:bg-white/5 transition-colors duration-500 ease-premium shrink-0"
+              >
+                <Info className="w-3.5 h-3.5" />
+                <span className="hidden xl:inline">안내사항</span>
+              </button>
 
               <div className="flex-1" />
 
@@ -375,6 +386,20 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
                   <span className="font-display text-2xl font-medium tracking-tight">{label}</span>
                 </motion.button>
               ))}
+
+              <motion.button
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 + navItems.length * 0.05, ease: EASE }}
+                onClick={() => {
+                  setIsNoticeOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-4 py-3 text-left text-zinc-500"
+              >
+                <Info className="w-5 h-5" />
+                <span className="font-display text-2xl font-medium tracking-tight">안내사항</span>
+              </motion.button>
             </nav>
 
             <div className="px-8 pb-10 pt-4 border-t border-white/5 flex items-center justify-between">
@@ -401,6 +426,69 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
                 </button>
               </div>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Notice popover */}
+      <AnimatePresence>
+        {isNoticeOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: EASE }}
+            onClick={() => setIsNoticeOpen(false)}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              transition={{ duration: 0.35, ease: EASE }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-shell max-w-md w-full shadow-2xl shadow-black/50"
+            >
+              <div className="glass-core backdrop-blur-2xl p-6 relative font-sans">
+                <button
+                  onClick={() => setIsNoticeOpen(false)}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-colors duration-500 ease-premium flex items-center justify-center"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0">
+                    <Info className="w-4 h-4" />
+                  </div>
+                  <h3 className="text-sm font-semibold text-white">안내사항</h3>
+                </div>
+
+                <div className="space-y-3 text-xs text-zinc-300 leading-relaxed">
+                  <p>
+                    안녕하세요. 개발자입니다. 배움과 테스트 과정에서 작게나마 만든 웹사이트다 보니 미흡한 부분이
+                    있어도 너그러운 양해 부탁드리겠습니다. 주의사항 몇가지만 말씀드리겠습니다.
+                  </p>
+                  <ol className="space-y-2 list-decimal list-inside">
+                    <li>
+                      스크린샷 업로드에서 발로란트 사용자 설정 게임의 점수판 부분을 승패와 스코어보드가 보이도록
+                      캡쳐해서 올려주시면 됩니다.
+                    </li>
+                    <li>
+                      점수판 전체를 캡쳐할 경우에는 AI가 글씨를 인식하는 부분에서 오류가 생기다보니 적당한 크기로
+                      캡쳐 부탁드리겠습니다.
+                    </li>
+                    <li>
+                      스크린샷 업로드는 한 분만 올려도 전체가 다 공유하는 내용이니 이점 유의 부탁드리겠습니다.
+                    </li>
+                  </ol>
+                  <p className="text-zinc-400">
+                    수정할 부분과 추가 사항이 있다면 디스코드 <span className="text-rose-400 font-semibold">@junhyeok_oso</span>로
+                    부탁드리겠습니다. 감사합니다.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
