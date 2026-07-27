@@ -1,6 +1,6 @@
 import React from 'react';
 import { PlayerProfile, RoleType } from '../types';
-import { getAgentPortraitUrl } from '../data/mockData';
+import { getAgentPortraitUrl, getPreferredPositions } from '../data/mockData';
 import { RoleIcon } from './RoleIcon';
 import { X, Target } from 'lucide-react';
 
@@ -77,17 +77,13 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
             </div>
 
             <div className="bg-white/[0.02] ring-1 ring-white/5 p-4 rounded-2xl">
-              <div className="text-[11px] text-zinc-500 font-mono mb-1.5">주요 플레이 요원</div>
+              <div className="text-[11px] text-zinc-500 font-mono mb-1.5">선호 포지션</div>
               <div className="flex items-center gap-1.5 flex-wrap">
-                {player.recentAgents.map((ag, i) => (
-                  <span key={i} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 ring-1 ring-white/10 text-xs font-bold text-cyan-400 font-mono">
-                    <img
-                      src={getAgentPortraitUrl(ag)}
-                      alt={ag}
-                      referrerPolicy="no-referrer"
-                      className="w-4 h-4 rounded-full object-cover bg-zinc-800"
-                    />
-                    <span>{ag}</span>
+                {getPreferredPositions(player).map((stat) => (
+                  <span key={stat.role} className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/5 ring-1 ring-white/10 text-xs font-bold text-cyan-400 font-mono">
+                    <RoleIcon role={stat.role} size="sm" />
+                    <span>{stat.role}</span>
+                    <span className="text-zinc-500 font-normal">{stat.matches}전 {stat.winRate}%</span>
                   </span>
                 ))}
               </div>

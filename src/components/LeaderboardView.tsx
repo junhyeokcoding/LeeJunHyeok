@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { PlayerProfile } from '../types';
-import { getAgentPortraitUrl } from '../data/mockData';
+import { getPreferredPositions } from '../data/mockData';
+import { RoleIcon } from './RoleIcon';
 import { Trophy, Search, Zap, Shield, ChevronRight, User, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
 
 interface LeaderboardViewProps {
@@ -196,7 +197,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     </div>
                   </th>
                   <th className="py-3.5 px-4 font-semibold">KDA</th>
-                  <th className="py-3.5 px-4 font-semibold">주요 요원</th>
+                  <th className="py-3.5 px-4 font-semibold">선호 포지션</th>
                   <th className="py-3.5 px-4 text-right font-semibold">프로필</th>
                 </tr>
               </thead>
@@ -245,18 +246,14 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
 
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        {player.recentAgents.map((ag, i) => (
+                        {getPreferredPositions(player).map((stat) => (
                           <span
-                            key={i}
+                            key={stat.role}
                             className="px-2 py-0.5 rounded-full bg-white/5 ring-1 ring-white/10 text-[11px] text-zinc-200 font-mono flex items-center gap-1.5"
                           >
-                            <img
-                              src={getAgentPortraitUrl(ag)}
-                              alt={ag}
-                              referrerPolicy="no-referrer"
-                              className="w-4 h-4 rounded-full object-cover bg-zinc-900 shrink-0"
-                            />
-                            <span>{ag}</span>
+                            <RoleIcon role={stat.role} size="sm" />
+                            <span>{stat.role}</span>
+                            <span className="text-zinc-500">{stat.matches}전 {stat.winRate}%</span>
                           </span>
                         ))}
                       </div>

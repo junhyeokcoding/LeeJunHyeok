@@ -1,4 +1,4 @@
-import { AgentStat, PlayerProfile, MatchRecord, RoleInfo, CustomServer } from '../types';
+import { AgentStat, PlayerProfile, MatchRecord, RoleInfo, RoleType, CustomServer } from '../types';
 
 export const AGENT_PORTRAITS: Record<string, string> = {
   // Duelists (타격대)
@@ -104,6 +104,16 @@ export function getAgentPortraitUrl(agentName: string): string {
   if (found) return AGENT_PORTRAITS[found];
 
   return 'https://media.valorant-api.com/agents/add6443a-41bd-e414-f6ad-e58d267f4e95/displayicon.png';
+}
+
+const ROLE_TYPES: RoleType[] = ['타격대', '감시자', '전략가', '척후대'];
+
+// Most-played role(s) first; ties broken by that role's win rate. Roles never played are excluded.
+export function getPreferredPositions(player: PlayerProfile) {
+  return ROLE_TYPES.map((role) => player.roleStats[role])
+    .filter((stat) => stat.matches > 0)
+    .sort((a, b) => b.matches - a.matches || b.winRate - a.winRate)
+    .slice(0, 2);
 }
 
 export const ROLE_DEFINITIONS: Record<string, RoleInfo> = {
