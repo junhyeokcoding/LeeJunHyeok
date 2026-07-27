@@ -25,7 +25,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   onSelectPlayer,
 }) => {
   const [filterQuery, setFilterQuery] = useState<string>('');
-  type SortableField = 'winRate' | 'avgCombatScore';
+  type SortableField = 'winRate' | 'avgCombatScore' | 'avgKda';
   const [sortField, setSortField] = useState<SortableField | null>(null);
   const [sortDirection, setSortDirection] = useState<'desc' | 'asc'>('desc');
 
@@ -40,13 +40,13 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
     }
   };
 
-  // Default: total matches played, descending. Clicking 승률/ACS cycles desc -> asc -> back to default.
+  // Default: global rank ascending (same order the rank badge reflects). Clicking 승률/ACS/KDA cycles desc -> asc -> back to default.
   const sortedPlayers = [...players].sort((a, b) => {
     if (sortField) {
       const mult = sortDirection === 'desc' ? -1 : 1;
       return (a[sortField] - b[sortField]) * mult;
     }
-    return b.matchesCount - a.matchesCount;
+    return a.rank - b.rank;
   });
 
   const filteredPlayers = sortedPlayers.filter((p) =>
@@ -196,7 +196,21 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       )}
                     </div>
                   </th>
-                  <th className="py-3.5 px-4 font-semibold">KDA</th>
+                  <th
+                    onClick={() => handleSortClick('avgKda')}
+                    className={`py-3.5 px-4 font-semibold cursor-pointer select-none ${
+                      sortField === 'avgKda' ? 'text-rose-400' : 'hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>KDA</span>
+                      {sortField === 'avgKda' ? (
+                        sortDirection === 'desc' ? <ArrowDown className="w-3 h-3" /> : <ArrowUp className="w-3 h-3" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3" />
+                      )}
+                    </div>
+                  </th>
                   <th className="py-3.5 px-4 font-semibold">선호 포지션</th>
                   <th className="py-3.5 px-4 text-right font-semibold">프로필</th>
                 </tr>
