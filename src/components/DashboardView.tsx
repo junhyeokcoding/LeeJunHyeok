@@ -31,22 +31,24 @@ interface DashboardViewProps {
 
 const EASE = [0.32, 0.72, 0, 1] as const;
 
-// Groups matches by calendar month (parsed from either the seeded "YYYY. MM. DD" format
-// or the "toLocaleString('ko-KR')" format newly-uploaded matches use) and returns the
-// most recent months that actually have data — so an empty server shows an empty chart.
-const getMonthlyTrend = (matches: MatchRecord[]): { label: string; count: number }[] => {
+// Groups matches by ISO week (Monday start, parsed from either the seeded "YYYY. MM. DD"
+// format or the "toLocaleString('ko-KR')" format newly-uploaded matches use) and returns
+// the most recent weeks that actually have data — so an empty server shows an empty chart.
+const getWeeklyTrend = (matches: MatchRecord[]): { label: string; count: number }[] => {
   const counts = new Map<string, number>();
   matches.forEach((m) => {
-    const parsed = m.date.match(/(\d{4})\D+(\d{1,2})\D/);
+    const parsed = m.date.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
     if (!parsed) return;
-    const key = `${parsed[1]}-${parsed[2].padStart(2, '0')}`;
+    const d = new Date(Number(parsed[1]), Number(parsed[2]) - 1, Number(parsed[3]));
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // roll back to Monday of that week
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     counts.set(key, (counts.get(key) || 0) + 1);
   });
   const recentKeys = Array.from(counts.keys()).sort().slice(-6);
-  return recentKeys.map((key) => ({
-    label: `${parseInt(key.split('-')[1], 10)}월`,
-    count: counts.get(key)!,
-  }));
+  return recentKeys.map((key) => {
+    const [, month, day] = key.split('-');
+    return { label: `${parseInt(month, 10)}/${parseInt(day, 10)}`, count: counts.get(key)! };
+  });
 };
 
 const reveal = (delay = 0) => ({
@@ -73,10 +75,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const top3Players = sortedPlayers.slice(0, 3);
 
   // Match trend: derived from real match dates, so an empty/new server renders empty.
-  const monthlyTrend = getMonthlyTrend(matches);
-  const maxTrendCount = Math.max(1, ...monthlyTrend.map((d) => d.count));
-  const trendPoints = monthlyTrend.map((d, i) => ({
-    x: monthlyTrend.length > 1 ? (i / (monthlyTrend.length - 1)) * 500 : 250,
+  const weeklyTrend = getWeeklyTrend(matches);
+  const maxTrendCount = Math.max(1, ...weeklyTrend.map((d) => d.count));
+  const trendPoints = weeklyTrend.map((d, i) => ({
+    x: weeklyTrend.length > 1 ? (i / (weeklyTrend.length - 1)) * 500 : 250,
     y: 140 - (d.count / maxTrendCount) * 120,
     ...d,
   }));
@@ -200,7 +202,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   전체 매치 분석 추이
                 </h2>
                 <p className="text-xs text-zinc-500 mt-1">
-                  최근 6개월간 등록된 10인 커스텀 경기 수 및 랭크 분포
+                  최근 6주간 등록된 10인 커스텀 경기 수 및 랭크 분포
                 </p>
               </div>
               {trendGrowthPct !== null && (
@@ -217,7 +219,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               )}
             </div>
 
-            {monthlyTrend.length === 0 ? (
+            {weeklyTrend.length === 0 ? (
               <div className="h-52 w-full flex items-center justify-center text-sm text-zinc-600">
                 아직 등록된 매치가 없습니다.
               </div>
@@ -261,8 +263,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
 
                 <div className="flex items-center justify-between text-xs text-zinc-500 font-mono pt-4 border-t border-white/5">
-                  {monthlyTrend.map((d, i) => (
-                    <span key={d.label + i} className={i === monthlyTrend.length - 1 ? 'text-rose-400 font-semibold' : ''}>
+                  {weeklyTrend.map((d, i) => (
+                    <span key={d.label + i} className={i === weeklyTrend.length - 1 ? 'text-rose-400 font-semibold' : ''}>
                       {d.label} ({d.count}건)
                     </span>
                   ))}
