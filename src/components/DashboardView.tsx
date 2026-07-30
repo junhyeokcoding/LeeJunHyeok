@@ -73,6 +73,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const sortedPlayers = [...players].sort((a, b) => b.winRate - a.winRate);
   const top3Players = sortedPlayers.slice(0, 3);
+  const mostPlayedPlayer = [...players].sort(
+    (a, b) => b.matchesCount - a.matchesCount || b.winRate - a.winRate
+  )[0];
 
   // Match trend: derived from real match dates, so an empty/new server renders empty.
   const weeklyTrend = getWeeklyTrend(matches);
@@ -157,9 +160,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               },
               {
                 icon: Trophy,
-                label: '최고 승률 (#1)',
-                value: `${top3Players[0]?.winRate ?? 0}%`,
-                unit: `(${top3Players[0]?.nickname || '-'})`,
+                label: '최다 플레이 (#1)',
+                value: `${mostPlayedPlayer?.matchesCount ?? 0}전`,
+                unit: `(${mostPlayedPlayer?.nickname || '-'})`,
                 tint: 'amber',
               },
             ].map(({ icon: Icon, label, value, unit, tint }) => (
